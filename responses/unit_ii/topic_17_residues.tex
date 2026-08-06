@@ -1,0 +1,767 @@
+\documentclass[12pt,a4paper]{article}
+
+% ---------------------------------------------------------------
+% PACKAGES
+% ---------------------------------------------------------------
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usepackage{array}
+
+% ---------------------------------------------------------------
+% TCOLORBOX ENVIRONMENTS
+% ---------------------------------------------------------------
+\newtcolorbox{curiositybox}[1]{colback=yellow!10, colframe=orange!80!black, fonttitle=\bfseries, title=#1, breakable}
+\newtcolorbox{infobox}[1]{colback=blue!5, colframe=blue!60!black, fonttitle=\bfseries, title=#1, breakable}
+\newtcolorbox{mistakebox}[1]{colback=red!5, colframe=red!60!black, fonttitle=\bfseries, title=#1, breakable}
+\newtcolorbox{learnbox}[1]{colback=green!5, colframe=green!60!black, fonttitle=\bfseries, title=#1, breakable}
+
+% ---------------------------------------------------------------
+% LSTLISTING SETUP
+% ---------------------------------------------------------------
+\lstset{language=Python, basicstyle=\ttfamily\small, keywordstyle=\color{blue},
+        commentstyle=\color{gray}, stringstyle=\color{red},
+        showstringspaces=false, breaklines=true, frame=single}
+
+% ---------------------------------------------------------------
+% FANCYHDR
+% ---------------------------------------------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{Topic 17: Residues}
+\rhead{Unit II --- Complex Variables}
+\cfoot{\thepage}
+
+% ---------------------------------------------------------------
+% TITLE
+% ---------------------------------------------------------------
+\title{\textbf{Topic 17: Residues}\\
+\large Unit II --- Complex Variable: Integration\\
+Complex Variables and Special Functions\\
+JNTUA College of Engineering (Autonomous)}
+\author{}
+\date{}
+
+% ---------------------------------------------------------------
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+% ================================================================
+% OPENING HOOK
+% ================================================================
+\begin{curiositybox}{Hook}
+A Laurent series may contain infinitely many terms, but when contour integration enters the scene,
+one coefficient suddenly becomes the star of the show --- the coefficient of $\dfrac{1}{z - z_0}$.
+That coefficient is called the \textbf{residue}, and it can determine the entire contour integral.
+\end{curiositybox}
+
+% ================================================================
+\section{Definition of Residue}
+% ================================================================
+
+\begin{infobox}{Definition: Residue at a Singular Point}
+Let $f(z)$ be analytic in a punctured neighbourhood $0 < |z - z_0| < R$ of a singular point $z_0$.
+The Laurent expansion of $f$ about $z_0$ is
+\[
+   f(z) = \sum_{n=-\infty}^{\infty} a_n (z - z_0)^n,
+\]
+where the coefficients are given by
+\[
+   a_n = \frac{1}{2\pi i} \oint_{C} \frac{f(z)}{(z-z_0)^{n+1}}\,dz.
+\]
+The \textbf{residue} of $f$ at $z_0$ is the coefficient $a_{-1}$:
+\[
+   \operatorname{Res}(f, z_0) = a_{-1}.
+\]
+Equivalently,
+\[
+   \operatorname{Res}(f, z_0)
+   = \frac{1}{2\pi i}\oint_{C} f(z)\,dz,
+\]
+where $C$ is any simple closed positively oriented contour encircling $z_0$ and no other singularity.
+\end{infobox}
+
+The residue is a single complex number attached to a singularity. Its importance lies in the fact that
+the entire closed-contour integral of $f$ around an isolated singularity collapses to $2\pi i$ times
+this one number, regardless of how complicated the rest of the Laurent series may be.
+
+\begin{learnbox}{Key Idea --- Section 1}
+$\operatorname{Res}(f,z_0) = a_{-1}$ is the coefficient of $(z-z_0)^{-1}$ in the Laurent
+series of $f$ about $z_0$.  All higher-order Laurent terms integrate to zero around a closed
+contour; only the $a_{-1}$ term survives.
+\end{learnbox}
+
+% ================================================================
+\section{Why Residues Matter}
+% ================================================================
+
+Before residues, evaluating $\oint_C f(z)\,dz$ required parameterising the contour and
+performing a direct integration --- a process that can be extremely tedious.
+Residues reduce this to \emph{algebraic arithmetic}: identify isolated singularities inside $C$,
+compute a number at each, sum, and multiply by $2\pi i$.
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Situation} & \textbf{Without Residues} & \textbf{With Residues} \\
+\midrule
+$\oint_C \frac{e^z}{z^3}\,dz$ & Parameterise $C$, expand $e^z$, integrate term-by-term & Read off $a_{-1} = \tfrac{1}{2}$; answer $= \pi i$ \\
+$\oint_C \frac{1}{z^2+1}\,dz$ & Partial fractions then parameterise & $\operatorname{Res} = \tfrac{1}{2i}$; answer $= \pi$ \\
+Real integral $\int_0^{2\pi}\!\frac{d\theta}{2+\cos\theta}$ & No elementary method & Convert to contour, read residue \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{learnbox}{Key Idea --- Section 2}
+Residues turn closed-contour complex integrals into pure algebra.  They also unlock otherwise
+intractable real definite integrals via the substitution $z = e^{i\theta}$ or by closing contours
+in the upper/lower half-plane.
+\end{learnbox}
+
+% ================================================================
+\section{Residue Formulas}
+% ================================================================
+
+\begin{infobox}{Formula 1 --- Coefficient from Laurent Series}
+Expand $f(z)$ in a Laurent series about $z_0$ and read off the $a_{-1}$ coefficient directly.
+\[
+   \operatorname{Res}(f, z_0) = a_{-1}
+   \qquad \text{(from the Laurent expansion)}.
+\]
+This method is always correct but can be laborious when the expansion is not obvious.
+\end{infobox}
+
+\begin{infobox}{Formula 2 --- Simple Pole ($m=1$)}
+If $z_0$ is a simple pole of $f$, then
+\[
+   \operatorname{Res}(f, z_0) = \lim_{z \to z_0}(z - z_0)\,f(z).
+\]
+\end{infobox}
+
+\begin{infobox}{Formula 3 --- Pole of Order $m$}
+If $z_0$ is a pole of order $m \geq 1$, then
+\[
+   \operatorname{Res}(f, z_0)
+   = \frac{1}{(m-1)!}\lim_{z \to z_0}
+     \frac{d^{\,m-1}}{dz^{\,m-1}}\!\left[(z-z_0)^m f(z)\right].
+\]
+\end{infobox}
+
+\begin{infobox}{Formula 4 --- Rational Function $f = p(z)/q(z)$ at a Simple Zero of $q$}
+If $q(z_0) = 0$, $q'(z_0) \neq 0$, and $p(z_0) \neq 0$, then $z_0$ is a simple pole of $p/q$ and
+\[
+   \operatorname{Res}\!\left(\frac{p}{q},\, z_0\right) = \frac{p(z_0)}{q'(z_0)}.
+\]
+This is the most efficient formula for rational functions with simple poles.
+\end{infobox}
+
+\begin{learnbox}{Key Idea --- Section 3}
+Four formulas exist.  The Laurent-series method is universal.  For simple poles of rational
+functions, the $p/q'$ formula is fastest.  For higher-order poles, the $(m-1)$th derivative formula
+is the standard route.
+\end{learnbox}
+
+% ================================================================
+\section{Choosing the Right Method}
+% ================================================================
+
+Selecting the wrong formula wastes time or produces errors.  The following decision guide
+covers every common case:
+
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Identify the type and order of the singularity first.}
+        Factor the denominator or examine the Laurent series behaviour near $z_0$.
+  \item \textbf{Simple pole ($m=1$):}
+        Use $\lim_{z\to z_0}(z-z_0)f(z)$.
+        If $f = p/q$ and $q'(z_0)\neq 0$, prefer $p(z_0)/q'(z_0)$ --- one less limit to evaluate.
+  \item \textbf{Pole of order $m \geq 2$:}
+        Multiply by $(z-z_0)^m$, differentiate $(m-1)$ times, divide by $(m-1)!$, then take $z\to z_0$.
+  \item \textbf{Essential singularity or when $m$ is unclear:}
+        Expand $f$ in a Laurent series directly and read $a_{-1}$.
+  \item \textbf{Trigonometric or exponential numerators:}
+        First simplify using Taylor expansions ($\sin z = z - z^3/6 + \cdots$, $e^z = 1 + z + \cdots$),
+        then apply simple or higher-order pole formula as appropriate.
+\end{enumerate}
+
+\begin{learnbox}{Key Idea --- Section 4}
+Always determine the pole order \emph{before} picking a formula.  A second-order pole treated
+as first-order gives a wrong answer with no error message.
+\end{learnbox}
+
+% ================================================================
+\section{Worked Examples}
+% ================================================================
+
+% ------------------------------------------------------------------
+\subsection*{Example 1: Simple Pole at a Real Point}
+
+Find $\operatorname{Res}\!\left(\dfrac{3z+1}{z-2},\; 2\right)$.
+
+\textbf{Solution.}
+$z = 2$ is a simple pole.  Using Formula 2:
+\[
+   \operatorname{Res} = \lim_{z\to 2}(z-2)\cdot\frac{3z+1}{z-2}
+   = \lim_{z\to 2}(3z+1) = 3(2)+1 = 7.
+\]
+
+\begin{learnbox}{Takeaway --- Example 1}
+For a simple pole of the form $\dfrac{g(z)}{z-z_0}$ with $g$ analytic at $z_0$, the residue
+is simply $g(z_0)$.
+\end{learnbox}
+
+% ------------------------------------------------------------------
+\subsection*{Example 2: Double Pole}
+
+Find $\operatorname{Res}\!\left(\dfrac{e^z}{(z-1)^2},\; 1\right)$.
+
+\textbf{Solution.}
+$z = 1$ is a pole of order $m = 2$.  Using Formula 3:
+\[
+   \operatorname{Res} = \frac{1}{(2-1)!}\lim_{z\to 1}\frac{d}{dz}\!\left[(z-1)^2\cdot\frac{e^z}{(z-1)^2}\right]
+   = \lim_{z\to 1}\frac{d}{dz}(e^z)
+   = \lim_{z\to 1} e^z = e^1 = e.
+\]
+
+\begin{learnbox}{Takeaway --- Example 2}
+For a double pole $\dfrac{g(z)}{(z-z_0)^2}$ with $g$ analytic at $z_0$, the residue equals $g'(z_0)$.
+\end{learnbox}
+
+% ------------------------------------------------------------------
+\subsection*{Example 3: Rational Function with Factorised Denominator}
+
+Find $\operatorname{Res}\!\left(\dfrac{z^2+2}{(z-1)(z+3)},\; 1\right)$ and
+$\operatorname{Res}\!\left(\dfrac{z^2+2}{(z-1)(z+3)},\; -3\right)$.
+
+\textbf{Solution.} Both poles are simple.
+
+At $z = 1$ (Formula 4 with $q(z) = (z-1)(z+3)$, $q'(z) = 2z+2$):
+\[
+   \operatorname{Res}(f, 1) = \frac{1^2+2}{2(1)+2} = \frac{3}{4}.
+\]
+
+At $z = -3$ ($q'(z)$ evaluated at $-3$: $2(-3)+2 = -4$):
+\[
+   \operatorname{Res}(f,-3) = \frac{(-3)^2+2}{-4} = \frac{11}{-4} = -\frac{11}{4}.
+\]
+
+\begin{learnbox}{Takeaway --- Example 3}
+When the denominator is already factorised, the $p/q'$ formula computes each simple-pole
+residue in one arithmetic step.
+\end{learnbox}
+
+% ------------------------------------------------------------------
+\subsection*{Example 4: Residue from Laurent Expansion Directly}
+
+Find $\operatorname{Res}\!\left(\dfrac{\sin z}{z^4},\; 0\right)$.
+
+\textbf{Solution.}
+Expand $\sin z$ about $z = 0$:
+\[
+   \sin z = z - \frac{z^3}{3!} + \frac{z^5}{5!} - \cdots
+\]
+Dividing by $z^4$:
+\[
+   \frac{\sin z}{z^4} = z^{-3} - \frac{1}{6}\,z^{-1} + \frac{z}{120} - \cdots
+\]
+The coefficient of $z^{-1}$ is $a_{-1} = -\dfrac{1}{6}$.
+
+Therefore $\operatorname{Res}\!\left(\dfrac{\sin z}{z^4},\, 0\right) = -\dfrac{1}{6}$.
+
+\begin{learnbox}{Takeaway --- Example 4}
+When the function involves a known Taylor series in the numerator, expanding and dividing is
+often faster than applying the derivative formula.
+\end{learnbox}
+
+% ------------------------------------------------------------------
+\subsection*{Example 5: Trigonometric Numerator --- Simple Pole}
+
+Find $\operatorname{Res}\!\left(\dfrac{\cos z}{z - \pi/2},\; \pi/2\right)$.
+
+\textbf{Solution.}
+$z_0 = \pi/2$ is a simple pole.
+\[
+   \operatorname{Res} = \lim_{z\to\pi/2}(z - \pi/2)\cdot\frac{\cos z}{z - \pi/2}
+   = \cos(\pi/2) = 0.
+\]
+
+\begin{learnbox}{Takeaway --- Example 5}
+A simple pole with residue zero means the function is actually analytic at that point (the
+apparent singularity is removable).  Always verify whether the apparent singularity is genuine.
+\end{learnbox}
+
+% ------------------------------------------------------------------
+\subsection*{Example 6: Pole of Order 3}
+
+Find $\operatorname{Res}\!\left(\dfrac{1}{z^3(z-2)},\; 0\right)$.
+
+\textbf{Solution.}
+$z = 0$ is a pole of order $m = 3$.
+\[
+   \phi(z) = z^3\cdot\frac{1}{z^3(z-2)} = \frac{1}{z-2}.
+\]
+\[
+   \phi'(z) = -\frac{1}{(z-2)^2}, \qquad
+   \phi''(z) = \frac{2}{(z-2)^3}.
+\]
+\[
+   \operatorname{Res} = \frac{1}{2!}\lim_{z\to 0}\phi''(z)
+   = \frac{1}{2}\cdot\frac{2}{(0-2)^3}
+   = \frac{1}{2}\cdot\frac{2}{-8}
+   = -\frac{1}{8}.
+\]
+
+\begin{learnbox}{Takeaway --- Example 6}
+For a pole of order $m$, multiply out $(z-z_0)^m$, differentiate $(m-1)$ times, divide by $(m-1)!$,
+and only then substitute $z = z_0$.  Do not rush to substitute earlier.
+\end{learnbox}
+
+% ------------------------------------------------------------------
+\subsection*{Example 7: Exponential-Type Function}
+
+Find $\operatorname{Res}\!\left(\dfrac{e^{2z}}{(z+1)^2},\; -1\right)$.
+
+\textbf{Solution.}
+$z = -1$ is a double pole ($m = 2$).
+\[
+   \phi(z) = (z+1)^2\cdot\frac{e^{2z}}{(z+1)^2} = e^{2z}.
+\]
+\[
+   \frac{d}{dz}e^{2z} = 2e^{2z}.
+\]
+\[
+   \operatorname{Res} = \frac{1}{1!}\lim_{z\to -1} 2e^{2z} = 2e^{-2}.
+\]
+
+\begin{learnbox}{Takeaway --- Example 7}
+Exponential functions differentiate cleanly.  For double poles with exponential numerators,
+the residue is just the first derivative of the numerator evaluated at the pole.
+\end{learnbox}
+
+% ------------------------------------------------------------------
+\subsection*{Example 8: Rational Function --- $p/q'$ Method}
+
+Find $\operatorname{Res}\!\left(\dfrac{z^3}{z^4-1},\; i\right)$.
+
+\textbf{Solution.}
+$z^4 - 1 = (z-1)(z+1)(z-i)(z+i)$.  So $z = i$ is a simple pole.
+Using $p/q'$ with $p(z) = z^3$ and $q(z) = z^4 - 1$:
+\[
+   q'(z) = 4z^3, \qquad q'(i) = 4i^3 = 4(-i) = -4i.
+\]
+\[
+   \operatorname{Res}(f,\, i) = \frac{i^3}{-4i} = \frac{-i}{-4i} = \frac{1}{4}.
+\]
+
+\begin{learnbox}{Takeaway --- Example 8}
+For simple poles of the form $z^n/(z^{2n}-1)$ or similar symmetric rational functions, the
+$p/q'$ formula gives the residue with minimal computation.
+\end{learnbox}
+
+% ------------------------------------------------------------------
+\subsection*{Example 9: Mixed --- Simple Poles via Partial Fractions Check}
+
+Find $\operatorname{Res}\!\left(\dfrac{2z+3}{z^2+3z+2},\; -1\right)$ and
+$\operatorname{Res}\!\left(\dfrac{2z+3}{z^2+3z+2},\; -2\right)$.
+
+\textbf{Solution.}
+Factor: $z^2+3z+2 = (z+1)(z+2)$.  Both poles are simple.
+
+$q'(z) = 2z+3$.
+
+At $z = -1$:
+\[
+   \operatorname{Res}(f,-1) = \frac{2(-1)+3}{2(-1)+3} = \frac{1}{1} = 1.
+\]
+
+At $z = -2$:
+\[
+   \operatorname{Res}(f,-2) = \frac{2(-2)+3}{2(-2)+3} = \frac{-1}{-1} = 1.
+\]
+
+\textbf{Verification by partial fractions:}
+\[
+   \frac{2z+3}{(z+1)(z+2)} = \frac{A}{z+1} + \frac{B}{z+2}.
+\]
+Setting $z=-1$: $A = 1$.  Setting $z=-2$: $B = 1$.
+The residues are indeed 1 and 1, confirming the $p/q'$ results. \checkmark
+
+\begin{learnbox}{Takeaway --- Example 9}
+Partial fractions provide an independent verification of residue computations for rational functions.
+A residue equals the numerator coefficient in the partial fraction expansion.
+\end{learnbox}
+
+% ================================================================
+\section{Method Selection Table (MANDATORY UPGRADE)}
+% ================================================================
+
+\begin{center}
+\begin{tabular}{@{}>{\raggedright}p{3.2cm} >{\raggedright}p{3.5cm} >{\raggedright\arraybackslash}p{7cm}@{}}
+\toprule
+\textbf{Singularity Type} & \textbf{Best Method} & \textbf{Formula to Use} \\
+\midrule
+Simple pole, general & Direct limit &
+$\operatorname{Res}(f,z_0) = \lim_{z\to z_0}(z-z_0)f(z)$ \\
+\midrule
+Simple pole, rational $p/q$ & $p/q'$ shortcut &
+$\operatorname{Res}(f,z_0) = p(z_0)/q'(z_0)$ \\
+\midrule
+Pole of order $m \geq 2$ & Derivative formula &
+$\dfrac{1}{(m-1)!}\lim_{z\to z_0}\dfrac{d^{m-1}}{dz^{m-1}}\!\left[(z-z_0)^m f(z)\right]$ \\
+\midrule
+Essential singularity & Laurent expansion &
+Read $a_{-1}$ directly from the series \\
+\midrule
+Unclear order & Laurent expansion &
+Expand until $(z-z_0)^{-1}$ term is identified; its coefficient is the residue \\
+\midrule
+Trig/exponential in numerator & Taylor expansion first &
+Substitute series (e.g.\ $\sin z = z - z^3/6 + \cdots$), then divide and read $a_{-1}$ \\
+\midrule
+Removable singularity & None needed &
+$\operatorname{Res}(f,z_0) = 0$ (no $z^{-1}$ term exists in Laurent series) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{learnbox}{Key Idea --- Section 6}
+The method-selection table is a diagnostic checklist.  Step one is \emph{always} to determine
+the type and order of the singularity; only then pick the matching formula.
+\end{learnbox}
+
+% ================================================================
+\section{Excel Example (MANDATORY)}
+% ================================================================
+
+\textbf{Goal.} Use a spreadsheet to numerically estimate the residue of
+$f(z) = \dfrac{1}{z(z-3)}$ at the simple pole $z = 3$ by computing
+$(z-3)f(z) = \dfrac{1}{z}$ for values of $z$ approaching 3 from both sides.
+The exact residue is $\operatorname{Res}(f,3) = \dfrac{1}{3}$.
+
+\begin{center}
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+\textbf{Col A} & \textbf{Col B} & \textbf{Col C} & \textbf{Col D} & \textbf{Col E} \\
+$z$ (real) & $z - 3$ & $f(z) = 1/(z(z-3))$ & $(z-3) \cdot f(z)$ & $|D - 1/3|$ (error) \\
+\midrule
+3.1  & \texttt{=A2-3}  & \texttt{=1/(A2*(A2-3))}  & \texttt{=B2*C2}  & \texttt{=ABS(D2-1/3)} \\
+3.01 & \texttt{=A3-3}  & \texttt{=1/(A3*(A3-3))}  & \texttt{=B3*C3}  & \texttt{=ABS(D3-1/3)} \\
+3.001& \texttt{=A4-3}  & \texttt{=1/(A4*(A4-3))}  & \texttt{=B4*C4}  & \texttt{=ABS(D4-1/3)} \\
+\midrule
+3.1  & 0.1    & 3.226... & 0.3226 & 0.0107 \\
+3.01 & 0.01   & 33.22... & 0.3322 & 0.0011 \\
+3.001& 0.001  & 333.2... & 0.3332 & 0.0001 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Spreadsheet instructions:}
+\begin{enumerate}[leftmargin=*]
+  \item Enter the $z$ values $3.1, 3.01, 3.001, 2.9, 2.99, 2.999$ in column A (rows 2--7).
+  \item Column B: \texttt{=A2-3} (the ``approach distance'').
+  \item Column C: \texttt{=1/(A2*(A2-3))} --- the full function $f(z)$.
+  \item Column D: \texttt{=B2*C2} --- this cancels the simple pole and should converge to $1/3$.
+  \item Column E: \texttt{=ABS(D2-1/3)} --- tracks the numerical error.
+  \item In cell G2 type the analytical residue: \texttt{=1/3}.
+  \item Observe that column D converges to $0.3333\ldots$ as $z \to 3$, confirming
+        $\operatorname{Res}(f,3) = 1/3$.
+\end{enumerate}
+
+\begin{learnbox}{Key Idea --- Excel Section}
+Multiplying $f(z)$ by $(z-z_0)$ and taking the numerical limit is the spreadsheet
+analogue of the simple-pole residue formula.  Column D converging to a constant is
+strong evidence of a simple pole with that constant as its residue.
+\end{learnbox}
+
+% ================================================================
+\section{Python Example (MANDATORY)}
+% ================================================================
+
+The following script uses \texttt{sympy} to compute residues for several
+representative functions from this topic.
+
+\begin{lstlisting}[language=Python]
+from sympy import *
+
+z = symbols('z')
+
+# Define functions
+f1 = (3*z + 1) / (z - 2)
+f2 = exp(z) / (z - 1)**2
+f3 = (z**2 + 2) / ((z - 1)*(z + 3))
+f4 = sin(z) / z**4
+f5 = (z**3) / (z**4 - 1)
+f6 = 1 / (z**3 * (z - 2))
+f7 = exp(2*z) / (z + 1)**2
+f8 = (2*z + 3) / (z**2 + 3*z + 2)
+
+functions = [
+    (f1, 2,   "Res( (3z+1)/(z-2),      z=2  )"),
+    (f2, 1,   "Res( exp(z)/(z-1)^2,    z=1  )"),
+    (f3, 1,   "Res( (z^2+2)/(...),      z=1  )"),
+    (f3, -3,  "Res( (z^2+2)/(...),      z=-3 )"),
+    (f4, 0,   "Res( sin(z)/z^4,         z=0  )"),
+    (f5, I,   "Res( z^3/(z^4-1),        z=i  )"),
+    (f6, 0,   "Res( 1/(z^3(z-2)),       z=0  )"),
+    (f7, -1,  "Res( exp(2z)/(z+1)^2,   z=-1 )"),
+    (f8, -1,  "Res( (2z+3)/(z^2+3z+2), z=-1 )"),
+    (f8, -2,  "Res( (2z+3)/(z^2+3z+2), z=-2 )"),
+]
+
+print("=" * 55)
+print("RESIDUE COMPUTATIONS USING SymPy")
+print("=" * 55)
+for (func, point, label) in functions:
+    res = residue(func, z, point)
+    print(f"{label}")
+    print(f"  = {res}")
+    print()
+
+# Expected output:
+# Res( (3z+1)/(z-2),      z=2  )  =  7
+# Res( exp(z)/(z-1)^2,    z=1  )  =  E  (i.e., e)
+# Res( (z^2+2)/(...),      z=1  )  =  3/4
+# Res( (z^2+2)/(...),      z=-3 )  =  -11/4
+# Res( sin(z)/z^4,         z=0  )  =  -1/6
+# Res( z^3/(z^4-1),        z=i  )  =  1/4
+# Res( 1/(z^3(z-2)),       z=0  )  =  -1/8
+# Res( exp(2z)/(z+1)^2,   z=-1 )  =  2*exp(-2)
+# Res( (2z+3)/(z^2+3z+2), z=-1 )  =  1
+# Res( (2z+3)/(z^2+3z+2), z=-2 )  =  1
+
+# Visualise the magnitude of f1 near z=2 on the real axis
+import numpy as np
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
+x_vals = np.linspace(1.5, 2.5, 400)
+# Avoid the pole point exactly
+mask = np.abs(x_vals - 2) > 1e-3
+f1_vals = (3*x_vals[mask] + 1) / (x_vals[mask] - 2)
+plt.figure()
+plt.plot(x_vals[mask], f1_vals, color='blue')
+plt.axvline(x=2, color='red', linestyle='--', label='pole z=2')
+plt.xlabel('x (real axis)')
+plt.ylabel('f1(x) = (3x+1)/(x-2)')
+plt.title('Behaviour of f1 near simple pole z=2')
+plt.legend()
+plt.ylim(-60, 60)
+plt.grid(True)
+plt.savefig('residue_pole_plot.png', dpi=100, bbox_inches='tight')
+print("Plot saved to residue_pole_plot.png")
+\end{lstlisting}
+
+\begin{learnbox}{Key Idea --- Python Section}
+\texttt{sympy.residue(f, z, z0)} computes the exact symbolic residue.
+For simple poles it applies the limit formula; for higher-order poles it uses the derivative
+formula automatically.  Always verify SymPy results against hand calculations on at least
+one example.
+\end{learnbox}
+
+% ================================================================
+\section{Viva Questions (8)}
+% ================================================================
+
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{What is the residue of $f$ at an isolated singularity $z_0$?}\\
+        It is the coefficient $a_{-1}$ in the Laurent expansion of $f$ about $z_0$,
+        i.e.\ $\operatorname{Res}(f,z_0) = a_{-1}$.
+
+  \item \textbf{State the simple-pole residue formula.}\\
+        If $z_0$ is a simple pole, $\operatorname{Res}(f,z_0) = \lim_{z\to z_0}(z-z_0)f(z)$.
+
+  \item \textbf{How does the residue formula change for a pole of order $m$?}\\
+        $\operatorname{Res}(f,z_0) = \dfrac{1}{(m-1)!}\lim_{z\to z_0}
+        \dfrac{d^{m-1}}{dz^{m-1}}\!\left[(z-z_0)^m f(z)\right].$
+
+  \item \textbf{When is the formula $\operatorname{Res}(p/q,\, z_0) = p(z_0)/q'(z_0)$ valid?}\\
+        When $q(z_0)=0$, $q'(z_0)\neq 0$, and $p(z_0)\neq 0$ --- i.e.\ $z_0$ is a simple
+        zero of $q$ and not a zero of $p$.
+
+  \item \textbf{What is the residue at a removable singularity?}\\
+        Zero, because there is no $z^{-1}$ term in the Laurent expansion at a removable singularity.
+
+  \item \textbf{Why is the residue independent of which Laurent series annulus is used?}\\
+        All Laurent series of $f$ in annuli sharing the same inner singularity $z_0$ have the same
+        $a_{-1}$ coefficient, since the contour-integral formula for $a_{-1}$ depends only on $f$
+        and $z_0$, not on the outer radius.
+
+  \item \textbf{Can a function have the same residue at two different poles?}\\
+        Yes.  For example, $f(z) = \dfrac{2z+3}{(z+1)(z+2)}$ has residue 1 at both $z=-1$ and $z=-2$.
+
+  \item \textbf{What is the connection between residues and contour integrals?}\\
+        By the Residue Theorem, $\oint_C f(z)\,dz = 2\pi i \sum \operatorname{Res}(f, z_k)$
+        where the sum is over all isolated singularities $z_k$ enclosed by $C$.
+\end{enumerate}
+
+% ================================================================
+\section{Descriptive Questions (5)}
+% ================================================================
+
+\begin{enumerate}[leftmargin=*]
+  \item Define the residue of a complex function at an isolated singularity.  Derive the residue
+        formula for a pole of order $m$ starting from the Laurent series and the contour-integral
+        formula for Laurent coefficients.
+
+  \item State and derive the formula $\operatorname{Res}(p/q, z_0) = p(z_0)/q'(z_0)$ for a simple
+        pole of $p(z)/q(z)$.  Use L'H\^{o}pital's rule or direct factorisation in your derivation.
+
+  \item Find the residues of $f(z) = \dfrac{z^2 - 4z + 5}{(z-1)^2(z-3)}$ at all its singularities.
+        Show every step and specify the order of each pole before applying any formula.
+
+  \item Explain, with an example, why Laurent series expansion is the most general method for computing
+        residues.  Include an example involving an essential singularity (e.g.\ $e^{1/z}$ at $z=0$).
+
+  \item Compute $\operatorname{Res}\!\left(\dfrac{e^{3z}}{(z+2)^3},\; -2\right)$ using the
+        order-3 pole formula.  Verify your answer by expanding $e^{3z}$ in a Taylor series
+        about $z=-2$ and reading off the $a_{-1}$ coefficient from $f$'s Laurent expansion.
+\end{enumerate}
+
+% ================================================================
+\section{Practice Problems (6)}
+% ================================================================
+
+\begin{enumerate}[leftmargin=*]
+  \item Find $\operatorname{Res}\!\left(\dfrac{5z-2}{z(z-1)},\; 0\right)$ and
+        $\operatorname{Res}\!\left(\dfrac{5z-2}{z(z-1)},\; 1\right)$.
+        \textit{[Hint: simple poles; use $p/q'$.  Answers: $-(-2)/(-1) = 2$ at $z=0$;
+        $(5-2)/1 = 3$ at $z=1$.]}
+
+  \item Find $\operatorname{Res}\!\left(\dfrac{\cos z}{z^2},\; 0\right)$.
+        \textit{[Hint: expand $\cos z = 1 - z^2/2 + \cdots$, divide by $z^2$; $a_{-1} = 0$.]}
+
+  \item Find $\operatorname{Res}\!\left(\dfrac{z}{(z^2+4)^2},\; 2i\right)$.
+        \textit{[Hint: double pole at $2i$; factor $(z^2+4)^2 = (z-2i)^2(z+2i)^2$; answer $= -i/16$.]}
+
+  \item Find $\operatorname{Res}\!\left(\dfrac{e^z}{z^4},\; 0\right)$.
+        \textit{[Hint: $e^z = 1 + z + z^2/2 + z^3/6 + \cdots$; divide by $z^4$;
+        $a_{-1}$ is the $z^{-1}$ term's coefficient $= 1/6$.]}
+
+  \item Find $\operatorname{Res}\!\left(\dfrac{1}{z^2(z^2+1)},\; 0\right)$.
+        \textit{[Hint: expand $1/(z^2+1) = 1 - z^2 + z^4 - \cdots$ for $|z|<1$;
+        then $f = z^{-2}(1 - z^2 + \cdots) = z^{-2} - 1 + \cdots$; $a_{-1} = 0$.]}
+
+  \item Find all residues of $f(z) = \dfrac{z^2}{(z-1)(z-2)(z-3)}$.
+        \textit{[Hint: three simple poles; use $p/q'$.  At $z=k$: $q'(k)$ is the product of
+        $(k-j)$ for $j\neq k$.  Answers: $1/2$ at $z=1$; $-4$ at $z=2$; $9/2$ at $z=3$.]}
+\end{enumerate}
+
+% ================================================================
+\section{MCQs (5)}
+% ================================================================
+
+\begin{enumerate}[leftmargin=*]
+
+\item The residue of $f(z) = \dfrac{1}{z-4}$ at $z=4$ is:
+\begin{enumerate}[(a)]
+  \item $0$
+  \item $4$
+  \item \textbf{$1$}
+  \item $-1$
+\end{enumerate}
+\textit{Explanation:} $z=4$ is a simple pole; $\operatorname{Res} = \lim_{z\to 4}(z-4)/(z-4) = 1$.
+
+\item The residue of $\dfrac{e^z}{z^2}$ at $z=0$ is:
+\begin{enumerate}[(a)]
+  \item $0$
+  \item \textbf{$1$}
+  \item $e$
+  \item $2$
+\end{enumerate}
+\textit{Explanation:} $e^z/z^2 = z^{-2} + z^{-1} + 1/2 + \cdots$; the coefficient of $z^{-1}$ is $1$.
+
+\item If $z_0$ is a pole of order $m=3$ of $f$, the residue formula requires differentiating
+$(z-z_0)^3 f(z)$ how many times?
+\begin{enumerate}[(a)]
+  \item 3 times
+  \item \textbf{2 times}
+  \item 1 time
+  \item 0 times
+\end{enumerate}
+\textit{Explanation:} The formula uses the $(m-1) = 2$nd derivative.
+
+\item The residue of $\dfrac{\sin z}{z^3}$ at $z=0$ is:
+\begin{enumerate}[(a)]
+  \item $1$
+  \item $0$
+  \item \textbf{$-1/6$}
+  \item $1/6$
+\end{enumerate}
+\textit{Explanation:} $\sin z/z^3 = z^{-2} - (1/6)z^{-0} + \cdots$; wait --- $\sin z = z - z^3/6 + \cdots$, so $\sin z / z^3 = z^{-2} - 1/6 + z^2/120 - \cdots$; there is no $z^{-1}$ term, so $\operatorname{Res} = 0$.
+
+\textit{Correction:} Residue $= 0$.  (See option (b).)
+
+\textbf{Corrected answer: (b) $0$.}
+
+\textit{Explanation:} $\sin z = z - z^3/6 + z^5/120 - \cdots$; dividing by $z^3$ gives
+$z^{-2} - 1/6 + z^2/120 - \cdots$.  No $z^{-1}$ term; residue $= 0$.
+
+\item For $f(z) = p(z)/q(z)$ with $q(z_0)=0$, $q'(z_0)\neq 0$, the residue at $z_0$ equals:
+\begin{enumerate}[(a)]
+  \item $p'(z_0)/q(z_0)$
+  \item $p(z_0)/q(z_0)$
+  \item \textbf{$p(z_0)/q'(z_0)$}
+  \item $p'(z_0)/q'(z_0)$
+\end{enumerate}
+\textit{Explanation:} This is the standard $p/q'$ formula for a simple pole of a rational function.
+
+\end{enumerate}
+
+% ================================================================
+\section{Common Mistakes}
+% ================================================================
+
+\begin{mistakebox}{Common Mistakes When Computing Residues}
+\begin{tabular}{@{}>{\raggedright}p{3.8cm} >{\raggedright}p{4.5cm} >{\raggedright\arraybackslash}p{5.5cm}@{}}
+\toprule
+\textbf{Mistake} & \textbf{What Goes Wrong} & \textbf{Correct Approach} \\
+\midrule
+Not identifying pole order first & Applying the simple-pole formula to a double pole gives a wrong answer & Always factor the denominator or check the Laurent series to determine $m$ before choosing a formula \\
+\midrule
+Sign error after partial fractions & Forgetting the negative sign when $q'(z_0) < 0$ & Carefully substitute $z_0$ into $q'$ and carry the sign through the fraction \\
+\midrule
+Wrong derivative order in higher-order pole formula & Differentiating $m$ times instead of $m-1$ times & The formula requires the $(m-1)$th derivative of $(z-z_0)^m f(z)$ \\
+\midrule
+Omitting division by $(m-1)!$ & The formula includes a $1/(m-1)!$ factor that students forget & Write the full formula first, then evaluate: $\dfrac{1}{(m-1)!}\cdot\lim(\cdots)$ \\
+\midrule
+Substituting $z=z_0$ before differentiating & Produces $0/0$ or an undefined expression & Differentiate $(z-z_0)^m f(z)$ symbolically, then substitute $z_0$ \\
+\midrule
+Treating a removable singularity as a pole & Applying residue formulas where the function is actually analytic & If $(z-z_0)f(z)\to 0$ as $z\to z_0$, the singularity is removable; residue $=0$ \\
+\midrule
+Using $\int$ instead of $\oint$ for closed contours & Notation inconsistency; may confuse orientation conventions & Always write $\oint_C$ for closed contour integrals \\
+\bottomrule
+\end{tabular}
+\end{mistakebox}
+
+% ================================================================
+\section{Quick Recap}
+% ================================================================
+
+\begin{learnbox}{Quick Recap --- Topic 17: Residues}
+\begin{itemize}[leftmargin=*]
+  \item The residue $\operatorname{Res}(f,z_0) = a_{-1}$ is the coefficient of $(z-z_0)^{-1}$ in the Laurent series of $f$ about $z_0$.
+  \item For a simple pole: $\operatorname{Res}(f,z_0) = \lim_{z\to z_0}(z-z_0)f(z)$.
+  \item For a rational function $p/q$ with a simple zero of $q$ at $z_0$: $\operatorname{Res} = p(z_0)/q'(z_0)$.
+  \item For a pole of order $m$: $\operatorname{Res}(f,z_0) = \dfrac{1}{(m-1)!}\lim_{z\to z_0}\dfrac{d^{m-1}}{dz^{m-1}}\!\left[(z-z_0)^m f(z)\right]$.
+  \item For functions with essential singularities or unclear order: expand in Laurent series and read $a_{-1}$ directly.
+  \item The residue at a removable singularity is always zero.
+  \item Always determine the pole order \emph{before} choosing a residue formula.
+  \item Residues are the key ingredient in the Cauchy Residue Theorem (Topic 18), enabling closed-contour integrals to be evaluated by pure algebra.
+\end{itemize}
+\end{learnbox}
+
+\end{document}
