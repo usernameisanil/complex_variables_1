@@ -1,0 +1,815 @@
+\documentclass[12pt,a4paper]{article}
+
+%% ============================================================
+%% PREAMBLE
+%% ============================================================
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage[most,breakable]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usepackage{array}
+
+%% ---- tcolorbox environments (positional title) ----
+\newtcolorbox{curiositybox}[1]{colback=yellow!10, colframe=orange!80!black, fonttitle=\bfseries, title=#1, breakable}
+\newtcolorbox{infobox}[1]{colback=blue!5, colframe=blue!60!black, fonttitle=\bfseries, title=#1, breakable}
+\newtcolorbox{mistakebox}[1]{colback=red!5, colframe=red!60!black, fonttitle=\bfseries, title=#1, breakable}
+\newtcolorbox{learnbox}[1]{colback=green!5, colframe=green!60!black, fonttitle=\bfseries, title=#1, breakable}
+
+%% ---- lstlisting (Python) ----
+\lstset{language=Python, basicstyle=\ttfamily\small, keywordstyle=\color{blue},
+        commentstyle=\color{gray}, stringstyle=\color{red},
+        showstringspaces=false, breaklines=true, frame=single}
+
+%% ---- fancyhdr ----
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{Topic 03: Differentiation}
+\rhead{Unit I --- Complex Variables}
+\cfoot{\thepage}
+
+%% ---- Title ----
+\title{\textbf{Topic 03: Differentiation}\\[6pt]
+       \large Unit I --- Complex Variable: Differentiation\\[4pt]
+       \normalsize Complex Variables and Special Functions\\
+       JNTUA College of Engineering (Autonomous)\\
+       B.Tech Engineering}
+\date{}
+
+%% ============================================================
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+%% ============================================================
+%% OPENING HOOK
+%% ============================================================
+\begin{curiositybox}{Hook}
+In real calculus, a derivative checks one direction of change along the number line.
+In complex analysis, the increment can approach zero from infinitely many directions
+in the plane. So if a derivative exists, the function has passed a much tougher test.
+\end{curiositybox}
+
+\bigskip
+
+%% ============================================================
+\section{Why Complex Differentiation Is Special}
+%% ============================================================
+
+In single-variable real calculus you can approach a limit from only two directions:
+from the left or from the right. If those two one-sided limits agree, the derivative
+exists. The complex plane is a two-dimensional arena; the increment $\Delta z$ can
+travel toward zero along any curved or straight path. A complex function
+$f : \mathbb{C} \to \mathbb{C}$ must return the same limiting ratio
+$\dfrac{f(z+\Delta z)-f(z)}{\Delta z}$ no matter which path $\Delta z$ follows.
+This requirement is vastly more restrictive than real differentiability.
+
+\begin{infobox}{Real vs.\ Complex Differentiability at a Glance}
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Feature} & \textbf{Real calculus} & \textbf{Complex analysis} \\
+\midrule
+Number of approach directions & 2 (left, right) & Infinitely many \\
+Differentiability $\Rightarrow$ continuity & Yes & Yes \\
+Differentiability $\Rightarrow$ analyticity & Not generally & Yes (if holds on a region) \\
+Differentiable $\Rightarrow$ smooth & Not always & Infinitely smooth \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{infobox}
+
+\begin{learnbox}{Key Takeaway}
+Complex differentiability is \emph{much stricter} than real differentiability.
+A function that is complex-differentiable at every point of an open region gains
+extraordinary smoothness properties not seen in real analysis.
+\end{learnbox}
+
+%% ============================================================
+\section{Definition of Derivative}
+%% ============================================================
+
+Let $f$ be a complex-valued function defined in a neighbourhood of $z_0 \in \mathbb{C}$.
+
+\begin{infobox}{Definition --- Complex Derivative}
+The \textbf{derivative} of $f$ at $z_0$ is defined as
+\[
+  f'(z_0) = \lim_{\Delta z \to 0} \frac{f(z_0 + \Delta z) - f(z_0)}{\Delta z},
+\]
+provided this limit \emph{exists and is the same for every path} along which
+$\Delta z \to 0$ in $\mathbb{C}$.
+
+\medskip
+\noindent Here $\Delta z = \Delta x + i\,\Delta y$ is a complex increment.
+The limit must be independent of the manner in which $\Delta z \to 0$.
+\end{infobox}
+
+\noindent\textbf{Why path independence is the key condition.}
+Write $\Delta z = |\Delta z|e^{i\alpha}$ where $\alpha$ is the angle of approach.
+For the limit to exist, the difference quotient must converge to the same complex number
+regardless of $\alpha$. When this holds, we say $f$ is \emph{complex differentiable}
+(or \emph{holomorphic}) at $z_0$.
+
+\begin{learnbox}{Key Takeaway}
+The complex derivative is a single-limit definition, but hidden inside it is a
+constraint on \emph{all} directions of approach simultaneously.
+\end{learnbox}
+
+%% ============================================================
+\section{Differentiability vs.\ Derivative at a Point}
+%% ============================================================
+
+\begin{infobox}{Terminology}
+\begin{itemize}[leftmargin=1.5em]
+  \item \textbf{Differentiable at $z_0$}: the limit in the definition exists at the
+        single point $z_0$.
+  \item \textbf{Analytic (holomorphic) at $z_0$}: $f$ is differentiable at every point
+        in \emph{some open neighbourhood} of $z_0$.
+  \item \textbf{Analytic on a region $D$}: $f$ is analytic at every point of $D$.
+  \item \textbf{Entire function}: analytic at every point of $\mathbb{C}$.
+\end{itemize}
+\end{infobox}
+
+A function may be differentiable at an isolated point without being analytic there.
+For example, $f(z) = |z|^2$ is differentiable only at $z = 0$ (as we shall verify
+later), but fails at every other point; it is therefore \emph{not} analytic anywhere.
+
+\medskip
+The chain of implications is:
+\[
+  \text{Entire} \;\Rightarrow\; \text{Analytic on } D
+  \;\Rightarrow\; \text{Analytic at } z_0
+  \;\Rightarrow\; \text{Differentiable at } z_0
+  \;\Rightarrow\; \text{Continuous at } z_0.
+\]
+None of these arrows reverses in general.
+
+\begin{learnbox}{Key Takeaway}
+Differentiability at a single isolated point is much weaker than analyticity.
+Always state \emph{where} a function is differentiable and whether that region is open.
+\end{learnbox}
+
+%% ============================================================
+\section{Standard Differentiation Rules}
+%% ============================================================
+
+\begin{infobox}{Differentiation Rules (valid wherever the functions are differentiable)}
+Let $f$ and $g$ be differentiable at $z$, and let $c \in \mathbb{C}$ be a constant.
+
+\medskip
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Rule} & \textbf{Formula} \\
+\midrule
+Constant & $\dfrac{d}{dz}[c] = 0$ \\[8pt]
+Constant multiple & $\dfrac{d}{dz}[c\,f(z)] = c\,f'(z)$ \\[8pt]
+Sum & $\dfrac{d}{dz}[f(z)+g(z)] = f'(z)+g'(z)$ \\[8pt]
+Product & $\dfrac{d}{dz}[f(z)g(z)] = f'(z)g(z)+f(z)g'(z)$ \\[8pt]
+Quotient & $\dfrac{d}{dz}\!\left[\dfrac{f(z)}{g(z)}\right]
+           = \dfrac{f'(z)g(z)-f(z)g'(z)}{[g(z)]^2},\quad g(z)\neq 0$ \\[10pt]
+Power & $\dfrac{d}{dz}[z^n] = n z^{n-1},\quad n\in\mathbb{Z}$ \\[8pt]
+Chain & $\dfrac{d}{dz}[f(g(z))] = f'(g(z))\cdot g'(z)$ \\
+\bottomrule
+\end{tabular}
+\end{infobox}
+
+\medskip\noindent\textbf{Example --- Product rule.}
+Let $f(z) = z^3$ and $g(z) = e^z$. Then:
+\[
+  \frac{d}{dz}[z^3 e^z] = 3z^2 e^z + z^3 e^z = e^z(3z^2 + z^3) = z^2 e^z(3+z).
+\]
+
+\medskip\noindent\textbf{Example --- Quotient rule.}
+Let $h(z) = \dfrac{z^2+1}{z-1}$, $z \neq 1$. Then:
+\[
+  h'(z) = \frac{2z(z-1) - (z^2+1)(1)}{(z-1)^2}
+         = \frac{2z^2 - 2z - z^2 - 1}{(z-1)^2}
+         = \frac{z^2 - 2z - 1}{(z-1)^2}.
+\]
+
+\medskip\noindent\textbf{Example --- Chain rule.}
+Let $p(z) = (z^2+3)^5$. Set $w = z^2+3$, so $p = w^5$. Then:
+\[
+  p'(z) = 5w^4 \cdot 2z = 10z(z^2+3)^4.
+\]
+
+\begin{learnbox}{Key Takeaway}
+All familiar real-calculus differentiation rules carry over verbatim to complex
+differentiable functions because the proofs use only the algebra of limits.
+\end{learnbox}
+
+%% ============================================================
+\section{Differentiation of Standard Complex Functions}
+%% ============================================================
+
+\begin{infobox}{Standard Complex Derivatives}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Function} & \textbf{Derivative} \\
+\midrule
+$z^n$ ($n \in \mathbb{Z}$) & $nz^{n-1}$ \\[4pt]
+$e^z$ & $e^z$ \\[4pt]
+$\sin z$ & $\cos z$ \\[4pt]
+$\cos z$ & $-\sin z$ \\[4pt]
+$\tan z$ & $\sec^2 z$ \\[4pt]
+$\sinh z$ & $\cosh z$ \\[4pt]
+$\cosh z$ & $\sinh z$ \\[4pt]
+$\ln z$ & $\dfrac{1}{z}$ (on each branch, away from branch cut) \\
+\bottomrule
+\end{tabular}
+\end{infobox}
+
+\noindent\textbf{Polynomials.}
+Any polynomial $P(z) = a_n z^n + a_{n-1}z^{n-1} + \cdots + a_0$ is entire;
+its derivative is $P'(z) = n a_n z^{n-1} + (n-1)a_{n-1}z^{n-2} + \cdots + a_1$.
+
+\medskip\noindent\textbf{Rational functions.}
+A rational function $R(z) = P(z)/Q(z)$ is analytic everywhere except at the zeros
+of $Q(z)$.
+
+\medskip\noindent\textbf{The exponential $e^z$.}
+Since $e^z = e^x(\cos y + i\sin y)$, one checks from the definition that
+$(e^z)' = e^z$ and $e^z \neq 0$ for all $z$.
+
+\medskip\noindent\textbf{$\sin z$ and $\cos z$.}
+Defined via $\sin z = \dfrac{e^{iz}-e^{-iz}}{2i}$ and
+$\cos z = \dfrac{e^{iz}+e^{-iz}}{2}$, both are entire functions;
+differentiating these definitions gives $(\sin z)' = \cos z$ and $(\cos z)' = -\sin z$.
+
+\medskip\noindent\textbf{Logarithm branch issue.}
+$\operatorname{Log} z = \ln|z| + i\,\operatorname{Arg}(z)$ is analytic in
+$\mathbb{C} \setminus (-\infty, 0]$ (the principal branch), where the branch cut
+along the negative real axis must be avoided. Its derivative there is $1/z$.
+Different branches differ by $2\pi i k$ for integer $k$ and are each analytic on
+their respective cut planes.
+
+\begin{learnbox}{Key Takeaway}
+Polynomials and $e^z$ are entire. Rational functions fail only at poles.
+$\sin z$ and $\cos z$ are entire. The logarithm requires a branch-cut choice
+and is never entire.
+\end{learnbox}
+
+%% ============================================================
+\section{Why Path Independence Matters}
+%% ============================================================
+
+We now sketch why the definition forces two special conditions that connect the partial
+derivatives of $u = \operatorname{Re}(f)$ and $v = \operatorname{Im}(f)$.
+Write $f(z) = u(x,y) + iv(x,y)$ with $z = x + iy$.
+
+\medskip\noindent\textbf{Path 1 --- Along the real axis} ($\Delta y = 0$, $\Delta z = \Delta x$):
+\[
+  f'(z) = \lim_{\Delta x \to 0} \frac{[u(x+\Delta x, y)-u(x,y)] + i[v(x+\Delta x,y)-v(x,y)]}{\Delta x}
+        = \frac{\partial u}{\partial x} + i\frac{\partial v}{\partial x}.
+\]
+
+\medskip\noindent\textbf{Path 2 --- Along the imaginary axis} ($\Delta x = 0$, $\Delta z = i\,\Delta y$):
+\[
+  f'(z) = \lim_{\Delta y \to 0}
+          \frac{[u(x,y+\Delta y)-u(x,y)] + i[v(x,y+\Delta y)-v(x,y)]}{i\,\Delta y}
+        = \frac{\partial v}{\partial y} - i\frac{\partial u}{\partial y}.
+\]
+
+Since both expressions must equal the \emph{same} complex number $f'(z)$, we equate
+real and imaginary parts:
+\[
+  \frac{\partial u}{\partial x} = \frac{\partial v}{\partial y},
+  \qquad
+  \frac{\partial u}{\partial y} = -\frac{\partial v}{\partial x}.
+\]
+These are the \textbf{Cauchy--Riemann equations}, the subject of Topic~04.
+
+\begin{infobox}{Connection to Topic 04}
+Path independence of the complex derivative is \emph{equivalent} to the
+Cauchy--Riemann equations holding (under suitable continuity assumptions).
+Every subsequent result in complex analysis --- from analyticity to power series
+to contour integration --- rests on this two-path argument.
+\end{infobox}
+
+\begin{learnbox}{Key Takeaway}
+Taking the limit along two perpendicular directions and demanding equality
+yields the Cauchy--Riemann equations. This is why complex differentiability
+is so restrictive and so powerful.
+\end{learnbox}
+
+%% ============================================================
+\section{Worked Examples}
+%% ============================================================
+
+%% --- Example 1 ---
+\subsection*{Example 1: Derivative of $z^2$ from First Principles}
+
+Let $f(z) = z^2$. Form the difference quotient:
+\[
+  \frac{f(z+\Delta z)-f(z)}{\Delta z}
+  = \frac{(z+\Delta z)^2 - z^2}{\Delta z}
+  = \frac{z^2 + 2z\,\Delta z + (\Delta z)^2 - z^2}{\Delta z}
+  = \frac{2z\,\Delta z + (\Delta z)^2}{\Delta z}
+  = 2z + \Delta z.
+\]
+Taking $\Delta z \to 0$:
+\[
+  f'(z) = \lim_{\Delta z\to 0}(2z + \Delta z) = 2z.
+\]
+The result is independent of the path because the expression $2z + \Delta z$ depends
+only on $|\Delta z|$ and $z$, not on the direction of $\Delta z$.
+
+\begin{learnbox}{Takeaway --- Example 1}
+$\dfrac{d}{dz}(z^2) = 2z$, confirmed from first principles. The algebra mirrors
+real calculus, but the path independence is non-trivial and crucial.
+\end{learnbox}
+
+%% --- Example 2 ---
+\subsection*{Example 2: Derivative of $1/z$ from First Principles}
+
+Let $f(z) = 1/z$, $z \neq 0$. Then:
+\[
+  \frac{f(z+\Delta z)-f(z)}{\Delta z}
+  = \frac{\dfrac{1}{z+\Delta z} - \dfrac{1}{z}}{\Delta z}
+  = \frac{z - (z+\Delta z)}{z(z+\Delta z)\,\Delta z}
+  = \frac{-\Delta z}{z(z+\Delta z)\,\Delta z}
+  = \frac{-1}{z(z+\Delta z)}.
+\]
+As $\Delta z \to 0$:
+\[
+  f'(z) = \frac{-1}{z \cdot z} = -\frac{1}{z^2}.
+\]
+
+\begin{learnbox}{Takeaway --- Example 2}
+$\dfrac{d}{dz}\!\left(\dfrac{1}{z}\right) = -\dfrac{1}{z^2}$ for all $z \neq 0$.
+This confirms the power rule $nz^{n-1}$ for $n=-1$.
+\end{learnbox}
+
+%% --- Example 3 ---
+\subsection*{Example 3: $\overline{z}$ Is Nowhere Differentiable}
+
+Let $f(z) = \overline{z} = x - iy$. Form the difference quotient with
+$\Delta z = \Delta x + i\,\Delta y$:
+\[
+  \frac{f(z+\Delta z)-f(z)}{\Delta z}
+  = \frac{\overline{z+\Delta z} - \overline{z}}{\Delta z}
+  = \frac{\overline{\Delta z}}{\Delta z}
+  = \frac{\Delta x - i\,\Delta y}{\Delta x + i\,\Delta y}.
+\]
+
+\textbf{Path 1} ($\Delta y = 0$, approach along real axis):
+\[
+  \frac{\Delta x}{\Delta x} = 1.
+\]
+
+\textbf{Path 2} ($\Delta x = 0$, approach along imaginary axis):
+\[
+  \frac{-i\,\Delta y}{i\,\Delta y} = -1.
+\]
+The two paths give different limits ($1$ and $-1$), so the limit does not exist.
+Therefore $f(z) = \overline{z}$ is \emph{nowhere differentiable}.
+
+\begin{learnbox}{Takeaway --- Example 3}
+$f(z) = \overline{z}$ fails the path-independence test at every point in $\mathbb{C}$.
+Real-valued intuition that ``a simple function should be differentiable'' does not
+apply in complex analysis.
+\end{learnbox}
+
+%% --- Example 4 ---
+\subsection*{Example 4: $|z|^2$ Is Differentiable Only at $z = 0$}
+
+Let $f(z) = |z|^2 = x^2 + y^2$ (real-valued). Then:
+\[
+  \frac{f(z+\Delta z)-f(z)}{\Delta z}
+  = \frac{|z+\Delta z|^2 - |z|^2}{\Delta z}.
+\]
+Expand $|z+\Delta z|^2 = (z+\Delta z)\overline{(z+\Delta z)}
+= z\overline{z} + z\overline{\Delta z} + \overline{z}\,\Delta z + |\Delta z|^2$:
+\[
+  \frac{z\overline{\Delta z} + \overline{z}\,\Delta z + |\Delta z|^2}{\Delta z}
+  = z \cdot \frac{\overline{\Delta z}}{\Delta z} + \overline{z} + \frac{|\Delta z|^2}{\Delta z}.
+\]
+As $\Delta z \to 0$, the last term $\to 0$. But $\dfrac{\overline{\Delta z}}{\Delta z}$ is
+path-dependent (from Example~3, it equals $1$ along the real axis and $-1$ along the
+imaginary axis) \emph{unless} $z = 0$, in which case the term $z\cdot\frac{\overline{\Delta z}}{\Delta z}$
+vanishes regardless. Therefore the limit exists only at $z = 0$, where $f'(0) = \overline{0} = 0$.
+
+\begin{learnbox}{Takeaway --- Example 4}
+$|z|^2$ is differentiable \emph{only} at the origin. It is not analytic anywhere.
+This shows isolated differentiability is possible without analyticity.
+\end{learnbox}
+
+%% --- Example 5 ---
+\subsection*{Example 5: Derivative of $e^{2z}$ Using the Chain Rule}
+
+Let $f(z) = e^{2z}$. Write $f(z) = e^{w}$ with $w = 2z$:
+\[
+  f'(z) = e^w \cdot \frac{dw}{dz} = e^{2z} \cdot 2 = 2e^{2z}.
+\]
+
+Verification via first principles: the difference quotient is
+\[
+  \frac{e^{2(z+\Delta z)} - e^{2z}}{\Delta z}
+  = e^{2z}\cdot\frac{e^{2\,\Delta z}-1}{\Delta z}
+  \to e^{2z} \cdot 2 = 2e^{2z}
+\]
+using $\lim_{w\to 0}\dfrac{e^w-1}{w} = 1$ (applied with $w = 2\,\Delta z \to 0$).
+
+\begin{learnbox}{Takeaway --- Example 5}
+The chain rule works identically in complex calculus. For $e^{cz}$,
+the derivative is always $c\,e^{cz}$.
+\end{learnbox}
+
+%% --- Example 6 ---
+\subsection*{Example 6: Testing Differentiability via Two Paths}
+
+Let $f(z) = \dfrac{z^2}{|z|}$ for $z \neq 0$ and $f(0) = 0$. Test differentiability at $z = 0$.
+
+Form the difference quotient at $z = 0$:
+\[
+  \frac{f(\Delta z) - f(0)}{\Delta z}
+  = \frac{(\Delta z)^2 / |\Delta z|}{\Delta z}
+  = \frac{\Delta z}{|\Delta z|}.
+\]
+Write $\Delta z = r e^{i\theta}$ (polar form). Then:
+\[
+  \frac{\Delta z}{|\Delta z|} = \frac{r e^{i\theta}}{r} = e^{i\theta} = \cos\theta + i\sin\theta.
+\]
+This depends on $\theta$ (the angle of approach). For example:
+\begin{itemize}
+  \item $\theta = 0$ (real axis): quotient $\to 1$.
+  \item $\theta = \pi/2$ (imaginary axis): quotient $\to i$.
+  \item $\theta = \pi/4$: quotient $\to \dfrac{1}{\sqrt{2}} + \dfrac{i}{\sqrt{2}}$.
+\end{itemize}
+Since the limit depends on $\theta$, $f$ is \emph{not differentiable} at the origin.
+
+\begin{learnbox}{Takeaway --- Example 6}
+When a difference quotient reduces to $e^{i\theta}$ (angle dependent), the limit
+cannot exist. Checking just one or two paths can reveal non-differentiability,
+but only checking \emph{all paths} (via Cauchy--Riemann) can confirm differentiability.
+\end{learnbox}
+
+%% ============================================================
+\section{Excel Example (MANDATORY)}
+%% ============================================================
+
+\subsection*{Numerical Approximation of the Difference Quotient Along Two Paths}
+
+We approximate $f'(z_0)$ for $f(z) = z^2$ at $z_0 = 1+i$ using
+$\Delta z = h$ (real) and $\Delta z = ih$ (imaginary), with $h \to 0$, and compare.
+
+\medskip
+\begin{center}
+\begin{tabular}{@{}cccccc@{}}
+\toprule
+\textbf{Col A} & \textbf{Col B} & \textbf{Col C} & \textbf{Col D}
+               & \textbf{Col E} & \textbf{Col F} \\
+$h$ & $\Delta z$ (real) & $\operatorname{Re}(Q_1)$ & $\operatorname{Im}(Q_1)$
+    & $\operatorname{Re}(Q_2)$ & $\operatorname{Im}(Q_2)$ \\
+\midrule
+0.1  & real $h$  & 2.1 & 2.0 & 2.0 & 2.1 \\
+0.01 & real $h$  & 2.01 & 2.0 & 2.0 & 2.01 \\
+0.001 & real $h$ & 2.001 & 2.0 & 2.0 & 2.001 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+\noindent\textbf{Excel column formulas} (with $z_0 = 1+i$, so $x_0=1$, $y_0=1$):
+
+\begin{itemize}
+  \item \textbf{A2}: \texttt{0.1} (step size $h$)
+  \item \textbf{A3}: \texttt{=A2/10} (decreasing $h$)
+  \item \textbf{Path 1 --- $\Delta z = h$ (real):}\\
+        $f(z_0+h) = (1+h+i)^2 = (1+h)^2 - 1 + 2(1+h)i$\\
+        \textbf{C2}: \texttt{=((1+A2)\^{}2 - 1\^{}2)/A2} $\to$ real part of $Q_1$\\
+        \textbf{D2}: \texttt{=(2*(1+A2)*1 - 2*1*1)/A2} $\to$ imaginary part of $Q_1$
+  \item \textbf{Path 2 --- $\Delta z = i\cdot h$ (imaginary):}\\
+        $f(z_0+ih) = (1+i(1+h))^2 = 1-(1+h)^2 + 2(1+h)i$\\
+        \textbf{E2}: \texttt{=(1-(1+A2)\^{}2 - (1-1\^{}2))/(A2)} $\to$ real part of $Q_2$\\
+        \textbf{F2}: \texttt{=(2*(1+A2) - 2*1)/A2} $\to$ imaginary part of $Q_2$
+\end{itemize}
+
+\noindent As $h \to 0$, both paths converge to $\operatorname{Re}=2$, $\operatorname{Im}=2$,
+confirming $f'(1+i) = 2(1+i) = 2+2i$.
+
+\medskip
+\noindent\textbf{Contrast with $g(z) = \overline{z}$:}
+For $g$, Path 1 gives quotient $= 1 + 0i$ for all $h$,
+while Path 2 gives $-1 + 0i$ for all $h$. These never agree,
+confirming non-differentiability regardless of $h$.
+
+\begin{learnbox}{Takeaway --- Excel Example}
+Numerical experiments with two orthogonal paths can quickly expose whether a function
+is likely differentiable. Convergence to the same value along both paths is a
+necessary (but not sufficient) condition for differentiability.
+\end{learnbox}
+
+%% ============================================================
+\section{Python Example (MANDATORY)}
+%% ============================================================
+
+\subsection*{Numerical Comparison: Differentiable vs.\ Non-Differentiable Function}
+
+The following script approximates the difference quotient of $f(z) = z^2$ (differentiable)
+and $g(z) = \overline{z}$ (non-differentiable) at $z_0 = 1 + i$ along four paths and
+prints the results.
+
+\begin{lstlisting}[language=Python]
+import cmath
+import numpy as np
+
+z0 = complex(1, 1)          # z0 = 1 + i
+h  = 1e-7                   # small step size
+
+def f(z):
+    return z**2             # differentiable: f'(z0) = 2*(1+i) = 2+2i
+
+def g(z):
+    return z.real - 1j*z.imag   # conjugate: nowhere differentiable
+
+# Four approach directions: real, imaginary, 45-deg, 135-deg
+directions = {
+    "Real axis (theta=0)":        complex(h, 0),
+    "Imag axis (theta=pi/2)":     complex(0, h),
+    "45-deg (theta=pi/4)":        complex(h/np.sqrt(2), h/np.sqrt(2)),
+    "135-deg (theta=3*pi/4)":     complex(-h/np.sqrt(2), h/np.sqrt(2)),
+}
+
+print("=" * 60)
+print(f"Difference quotient at z0 = {z0}")
+print("=" * 60)
+
+for label, dz in directions.items():
+    qf = (f(z0 + dz) - f(z0)) / dz      # quotient for z^2
+    qg = (g(z0 + dz) - g(z0)) / dz      # quotient for conj(z)
+    print(f"\nDirection: {label}")
+    print(f"  f(z)=z^2  => Q = {qf:.6f}   (expected: 2+2i)")
+    print(f"  g(z)=zbar => Q = {qg:.6f}   (path-dependent!)")
+
+# Expected output:
+# ============================================================
+# Difference quotient at z0 = (1+1j)
+# ============================================================
+#
+# Direction: Real axis (theta=0)
+#   f(z)=z^2  => Q = (2.000000+2.000000j)   (expected: 2+2i)
+#   g(z)=zbar => Q = (1.000000+0.000000j)   (path-dependent!)
+#
+# Direction: Imag axis (theta=pi/2)
+#   f(z)=z^2  => Q = (2.000000+2.000000j)   (expected: 2+2i)
+#   g(z)=zbar => Q = (-1.000000+0.000000j)  (path-dependent!)
+#
+# Direction: 45-deg (theta=pi/4)
+#   f(z)=z^2  => Q = (2.000000+2.000000j)   (expected: 2+2i)
+#   g(z)=zbar => Q = (0.000000-1.000000j)   (path-dependent!)
+#
+# Direction: 135-deg (theta=3*pi/4)
+#   f(z)=z^2  => Q = (2.000000+2.000000j)   (expected: 2+2i)
+#   g(z)=zbar => Q = (0.000000+1.000000j)   (path-dependent!)
+\end{lstlisting}
+
+\begin{learnbox}{Takeaway --- Python Example}
+For $f(z)=z^2$, the difference quotient $\approx 2+2i$ along every path tested,
+confirming differentiability. For $g(z)=\overline{z}$, the quotient depends strongly
+on direction, confirming nowhere-differentiability.
+\end{learnbox}
+
+%% ============================================================
+\section{Viva Questions}
+%% ============================================================
+
+\begin{enumerate}[label=\textbf{Q\arabic*.}, leftmargin=2.5em]
+
+\item \textbf{State the definition of the complex derivative of $f$ at $z_0$.}\\
+The complex derivative is
+$f'(z_0) = \lim_{\Delta z\to 0}\dfrac{f(z_0+\Delta z)-f(z_0)}{\Delta z}$,
+provided the limit exists and equals the same value for every path of approach.
+
+\item \textbf{Why is complex differentiability more restrictive than real differentiability?}\\
+In $\mathbb{R}$ there are only two directions of approach; the limit must be the same
+from left and right. In $\mathbb{C}$ there are infinitely many directions, and the limit
+must agree along all of them simultaneously.
+
+\item \textbf{Show that $f(z) = \overline{z}$ is nowhere differentiable.}\\
+The difference quotient equals $\overline{\Delta z}/\Delta z$. Along the real axis this
+is $1$; along the imaginary axis it is $-1$. Since these differ, the limit does not
+exist at any point.
+
+\item \textbf{What is the difference between being differentiable at a point and being analytic at a point?}\\
+Differentiable at $z_0$ means the derivative exists at that single point.
+Analytic at $z_0$ means differentiable in some open neighbourhood of $z_0$.
+Analyticity is the stronger condition.
+
+\item \textbf{State the chain rule for complex functions.}\\
+If $g$ is differentiable at $z$ and $f$ is differentiable at $g(z)$, then
+$(f \circ g)'(z) = f'(g(z))\cdot g'(z)$.
+
+\item \textbf{What does path independence of the complex derivative imply for $u$ and $v$?}\\
+It implies the Cauchy--Riemann equations:
+$u_x = v_y$ and $u_y = -v_x$,
+where $f = u + iv$ and subscripts denote partial derivatives.
+
+\item \textbf{Is $f(z) = |z|^2$ analytic? Justify.}\\
+No. $f$ is differentiable only at $z=0$ (with $f'(0)=0$) and nowhere else.
+Since differentiability does not hold on any open set, $f$ is not analytic anywhere.
+
+\item \textbf{State the power rule and give its proof sketch for $n \in \mathbb{Z}$, $n \geq 1$.}\\
+The power rule states $\dfrac{d}{dz}(z^n) = nz^{n-1}$.
+Proof sketch: expand $(z+\Delta z)^n$ using the binomial theorem;
+all terms except $nz^{n-1}\Delta z$ contain $(\Delta z)^k$ for $k\geq 2$,
+which vanish after dividing by $\Delta z$ and letting $\Delta z \to 0$.
+
+\end{enumerate}
+
+%% ============================================================
+\section{Descriptive Questions}
+%% ============================================================
+
+\begin{enumerate}[label=\textbf{D\arabic*.}, leftmargin=2.5em]
+
+\item \textbf{Define the derivative of a complex function at a point. Explain why the path
+      of approach of $\Delta z$ is critical, and use two explicit paths to show that
+      $f(z)=\overline{z}$ is not differentiable anywhere.} \hfill[10 marks]
+
+\item \textbf{State and prove all standard differentiation rules (sum, product, quotient, chain)
+      for complex functions, and illustrate each with a fully worked numerical example.}
+      \hfill[10 marks]
+
+\item \textbf{Show from first principles that $\dfrac{d}{dz}(z^n) = nz^{n-1}$ for any positive
+      integer $n$. Discuss what happens for negative integers and fractional powers.}
+      \hfill[10 marks]
+
+\item \textbf{Prove that differentiability of $f$ at $z_0$ implies continuity of $f$ at $z_0$.
+      Show by an example that the converse is false.} \hfill[10 marks]
+
+\item \textbf{Show that the path-independence requirement for the complex derivative naturally
+      leads to the Cauchy--Riemann equations $u_x = v_y$ and $u_y = -v_x$.
+      Derive these by approaching along the real and imaginary axes.} \hfill[10 marks]
+
+\end{enumerate}
+
+%% ============================================================
+\section{Practice Problems}
+%% ============================================================
+
+\begin{enumerate}[label=\textbf{P\arabic*.}, leftmargin=2.5em]
+
+\item Find $f'(z)$ from first principles for $f(z) = z^3$.
+      \textit{Hint: Expand $(z+\Delta z)^3$ and cancel.}
+
+\item Using the quotient rule, differentiate $h(z) = \dfrac{z^3-1}{z^2+1}$ and
+      simplify your answer.
+      \textit{Hint: Apply numerator $\cdot$ denominator rule carefully; result involves a
+      single fraction.}
+
+\item Show that $f(z) = \operatorname{Im}(z) = y$ is not differentiable at any point by
+      computing the difference quotient along two perpendicular paths.
+      \textit{Hint: Along the real axis the quotient is $0$; along the imaginary axis it is $1/i = -i$.}
+
+\item Let $f(z) = z|z|$. Determine whether $f$ is differentiable at $z = 0$.
+      \textit{Hint: Write $f(\Delta z) = \Delta z \cdot |\Delta z|$; form the quotient
+      $\Delta z\,|\Delta z|/\Delta z = |\Delta z| \to 0$, so $f'(0) = 0$.}
+
+\item Differentiate $F(z) = \sin(z^2)$ using the chain rule.
+      \textit{Hint: $\dfrac{d}{dz}[\sin(z^2)] = \cos(z^2)\cdot 2z$.}
+
+\item Compute $\dfrac{d}{dz}\!\left[\dfrac{e^z}{z^2+4}\right]$ and find all $z$ where the
+      derivative fails to exist.
+      \textit{Hint: Use quotient rule; denominator $z^2+4 = 0$ at $z = \pm 2i$.}
+
+\end{enumerate}
+
+%% ============================================================
+\section{MCQs}
+%% ============================================================
+
+\begin{enumerate}[label=\textbf{MCQ \arabic*.}, leftmargin=3em]
+
+\item The derivative of $f(z)=z^4$ at $z=1+i$ is:
+\begin{enumerate}[label=(\alph*)]
+  \item $4(1+i)^2$
+  \item \textbf{$4(1+i)^3$}
+  \item $4(1+i)^4$
+  \item $4$
+\end{enumerate}
+\textit{Explanation:} The power rule gives $f'(z)=4z^3$; substituting $z=1+i$:
+$f'(1+i)=4(1+i)^3$.
+
+\medskip
+\item Which of the following is \textbf{nowhere differentiable}?
+\begin{enumerate}[label=(\alph*)]
+  \item $f(z) = z^2$
+  \item $f(z) = e^z$
+  \item \textbf{$f(z) = \overline{z}$}
+  \item $f(z) = \sin z$
+\end{enumerate}
+\textit{Explanation:} $\overline{z}$ gives path-dependent difference quotients
+($1$ vs $-1$); it is nowhere differentiable.
+
+\medskip
+\item If the complex derivative $f'(z_0)$ exists, the limit must be independent of:
+\begin{enumerate}[label=(\alph*)]
+  \item the modulus of $\Delta z$ only
+  \item \textbf{the direction (argument) of $\Delta z$}
+  \item the real part of $z_0$
+  \item the imaginary part of $f(z_0)$
+\end{enumerate}
+\textit{Explanation:} Path independence means the limit must not depend on the
+angle $\arg(\Delta z)$ as $|\Delta z| \to 0$.
+
+\medskip
+\item The function $f(z) = |z|^2$ is differentiable:
+\begin{enumerate}[label=(\alph*)]
+  \item Everywhere in $\mathbb{C}$
+  \item Only for $|z| > 1$
+  \item \textbf{Only at $z = 0$}
+  \item Nowhere
+\end{enumerate}
+\textit{Explanation:} The difference quotient reduces to a path-dependent expression
+at every $z \neq 0$, but at $z=0$ the term $z\cdot(\overline{\Delta z}/\Delta z)$
+vanishes and the limit equals $0$.
+
+\medskip
+\item Differentiability at a single isolated point implies:
+\begin{enumerate}[label=(\alph*)]
+  \item Analyticity at that point
+  \item \textbf{Continuity at that point}
+  \item Analyticity in a neighbourhood
+  \item That the Cauchy--Riemann equations hold in an open set
+\end{enumerate}
+\textit{Explanation:} Differentiability always implies continuity. It does \emph{not}
+imply analyticity unless it holds throughout a neighbourhood.
+
+\end{enumerate}
+
+%% ============================================================
+\section{Common Mistakes}
+%% ============================================================
+
+\begin{mistakebox}{Common Mistakes in Complex Differentiation}
+\begin{center}
+\begin{tabular}{@{}p{5cm}p{4.5cm}p{5cm}@{}}
+\toprule
+\textbf{Mistake} & \textbf{Wrong reasoning} & \textbf{Correct reasoning} \\
+\midrule
+Assuming real differentiability is enough &
+``$f(x,y)$ has partial derivatives, so $f$ is complex-differentiable'' &
+Complex differentiability requires the Cauchy--Riemann equations AND continuity of partials \\
+\midrule
+Checking only one path &
+``Limit along real axis exists, so derivative exists'' &
+Must verify limit is the same along \emph{all} paths; one path is insufficient \\
+\midrule
+Confusing differentiable with analytic &
+``$|z|^2$ is differentiable at $0$, so it's analytic'' &
+Analytic requires differentiability in an open neighbourhood, not just one point \\
+\midrule
+Algebraic error in complex quotient &
+Forgetting to multiply numerator and denominator by conjugate when simplifying &
+Keep track of real and imaginary parts separately; use $z\overline{z} = |z|^2$ \\
+\midrule
+Using $\int$ instead of $\oint$ &
+Writing $\int_C$ for a closed contour later in the course &
+Closed contours always use $\oint_C$; this becomes important in Topics 09--18 \\
+\midrule
+Ignoring direction of increment &
+Computing the quotient only for real $\Delta z$ &
+Must set up $\Delta z = \Delta x + i\,\Delta y$ and test arbitrary direction \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{mistakebox}
+
+%% ============================================================
+\section{Quick Recap}
+%% ============================================================
+
+\begin{learnbox}{Quick Recap --- Topic 03: Differentiation}
+\begin{itemize}[leftmargin=1.5em]
+  \item The complex derivative is defined by the same difference-quotient formula as in
+        real calculus, but the limit must hold along \emph{every} path.
+  \item Path independence is the key constraint; it forces
+        $u_x = v_y$ and $u_y = -v_x$ (Cauchy--Riemann equations, Topic~04).
+  \item All real-calculus rules --- sum, product, quotient, chain, power --- carry over
+        verbatim to complex differentiable functions.
+  \item $e^z$, $\sin z$, $\cos z$, and all polynomials are entire (differentiable
+        everywhere in $\mathbb{C}$).
+  \item $\overline{z}$ and $|z|^2$ are \emph{not} analytic; $|z|^2$ is differentiable
+        only at the origin.
+  \item Differentiability at an isolated point implies continuity, but \emph{not}
+        analyticity; analyticity requires differentiability on an open set.
+  \item Logarithm branches are analytic only on cut planes; the branch cut must be
+        specified and avoided.
+  \item The two-path derivation of the Cauchy--Riemann equations is the conceptual
+        bridge from this topic to every subsequent result in complex analysis.
+\end{itemize}
+\end{learnbox}
+
+\end{document}
