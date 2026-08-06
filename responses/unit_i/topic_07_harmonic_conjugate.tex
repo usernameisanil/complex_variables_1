@@ -1,0 +1,858 @@
+\documentclass[12pt,a4paper]{article}
+
+% ── Packages ──────────────────────────────────────────────────────────────────
+\usepackage{amsmath,amssymb}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage[most,breakable]{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usepackage{array}
+
+% ── tcolorbox environments ─────────────────────────────────────────────────────
+\newtcolorbox{curiositybox}[1]{colback=yellow!10,colframe=orange!80!black,fonttitle=\bfseries,title=#1,breakable}
+\newtcolorbox{infobox}[1]{colback=blue!5,colframe=blue!60!black,fonttitle=\bfseries,title=#1,breakable}
+\newtcolorbox{mistakebox}[1]{colback=red!5,colframe=red!60!black,fonttitle=\bfseries,title=#1,breakable}
+\newtcolorbox{learnbox}[1]{colback=green!5,colframe=green!60!black,fonttitle=\bfseries,title=#1,breakable}
+
+% ── lstlisting ─────────────────────────────────────────────────────────────────
+\lstset{language=Python,basicstyle=\ttfamily\small,keywordstyle=\color{blue},
+        commentstyle=\color{gray},stringstyle=\color{red},
+        showstringspaces=false,breaklines=true,frame=single}
+
+% ── fancyhdr ───────────────────────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{Topic 07: Harmonic Conjugate}
+\rhead{Unit I --- Complex Variables}
+\cfoot{\thepage}
+
+% ── Title ──────────────────────────────────────────────────────────────────────
+\title{\textbf{Topic 07: Finding Harmonic Conjugate}\\
+       \large Unit I --- Complex Variable: Differentiation\\
+       Complex Variables and Special Functions\\
+       JNTUA College of Engineering (Autonomous)}
+\author{B.Tech Engineering --- Lecture Notes}
+\date{}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Opening Hook}
+
+\begin{curiositybox}{Hook}
+Suppose someone gives you only the real part of an analytic function. Can you recover the
+missing imaginary part? Surprisingly, yes --- if the given function is harmonic. The missing
+partner is called the harmonic conjugate.
+\end{curiositybox}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Why Harmonic Conjugates Matter}
+
+In many engineering applications --- heat conduction, electrostatics, fluid flow --- the
+governing equations reduce to Laplace's equation. When we model such a problem, we often
+know one real-valued harmonic function (say the temperature distribution or the electric
+potential) but need the companion function to form a complete analytic function. The harmonic
+conjugate is precisely that companion.
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Situation} & \textbf{Without conjugate} & \textbf{With conjugate} \\
+\midrule
+Heat flow & Only temperature $u$ known & Recover heat-flux potential $v$ \\
+Electrostatics & Only potential $u$ known & Recover field lines via $v$ \\
+Fluid mechanics & Only velocity potential $u$ & Recover stream function $v$ \\
+Complex analysis & Isolated real part & Full analytic function $f(z)=u+iv$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{learnbox}{Key Takeaway}
+Whenever $u$ (or $v$) is harmonic, we can recover the partner function using the
+Cauchy--Riemann (C-R) equations, giving us a full analytic function $f(z)=u+iv$.
+\end{learnbox}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Definition}
+
+\begin{infobox}{Harmonic Conjugate --- Formal Definition}
+Let $u(x,y)$ be harmonic in a simply connected domain $D$ (i.e.\
+$u_{xx}+u_{yy}=0$ throughout $D$). A function $v(x,y)$ is called the
+\textbf{harmonic conjugate} of $u$ if
+\[
+  \frac{\partial u}{\partial x}=\frac{\partial v}{\partial y}
+  \qquad\text{and}\qquad
+  \frac{\partial u}{\partial y}=-\frac{\partial v}{\partial x}
+\]
+(the Cauchy--Riemann equations), so that $f(z)=u(x,y)+iv(x,y)$ is analytic in $D$.
+
+\medskip
+\textbf{Notes:}
+\begin{itemize}[leftmargin=1.5em]
+  \item $v$ is itself harmonic once $u$ is harmonic and the C-R equations hold.
+  \item The harmonic conjugate is unique \emph{up to an additive real constant}.
+  \item $v$ is \emph{not} the harmonic conjugate of $u$ --- the relationship is
+        ordered: $v$ is the conjugate of $u$, not vice versa (though $-u$ is the
+        harmonic conjugate of $v$).
+\end{itemize}
+\end{infobox}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Method Using C-R Equations}
+
+\begin{infobox}{Step-by-Step Procedure (given $u$, find $v$)}
+\textbf{Step 1.} Verify (or assume) $u$ satisfies $u_{xx}+u_{yy}=0$.
+
+\textbf{Step 2.} Compute $u_x = \dfrac{\partial u}{\partial x}$ and
+                               $u_y = \dfrac{\partial u}{\partial y}$.
+
+\textbf{Step 3.} Use $v_y = u_x$ to write $v = \displaystyle\int u_x\,dy + \phi(x)$,
+where $\phi(x)$ is an \emph{unknown function of $x$ alone} (the ``constant'' of integration
+in $y$).
+
+\textbf{Step 4.} Differentiate the result with respect to $x$:
+$v_x = \dfrac{\partial}{\partial x}\!\left[\int u_x\,dy\right] + \phi'(x)$.
+
+\textbf{Step 5.} Apply the second C-R equation: $v_x = -u_y$.
+Set the expression from Step 4 equal to $-u_y$ and solve for $\phi'(x)$.
+
+\textbf{Step 6.} Integrate to find $\phi(x)$ (a constant $c$ appears here).
+
+\textbf{Step 7.} Write the complete $v(x,y)$ and, if required, $f(z)=u+iv$.
+\end{infobox}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Alternative Starting from $v$}
+
+\begin{infobox}{Step-by-Step Procedure (given $v$, find $u$)}
+\textbf{Step 1.} Verify $v_{xx}+v_{yy}=0$.
+
+\textbf{Step 2.} Compute $v_x$ and $v_y$.
+
+\textbf{Step 3.} Use $u_x = v_y$, so $u = \displaystyle\int v_y\,dx + \psi(y)$,
+where $\psi(y)$ is an unknown function of $y$ alone.
+
+\textbf{Step 4.} Differentiate: $u_y = \dfrac{\partial}{\partial y}\!\left[\int v_y\,dx\right] + \psi'(y)$.
+
+\textbf{Step 5.} Apply $u_y = -v_x$. Solve for $\psi'(y)$ and integrate.
+
+\textbf{Step 6.} Write $u(x,y)$ and $f(z)=u+iv$.
+\end{infobox}
+
+\begin{learnbox}{Remember}
+Whether you start from $u$ or $v$, the key is: one C-R equation gives the integration
+direction; the other determines the unknown function of the remaining variable.
+\end{learnbox}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Uniqueness Up to an Additive Constant}
+
+\begin{infobox}{Uniqueness Theorem}
+If $v_1$ and $v_2$ are both harmonic conjugates of the same $u$ in a connected domain $D$,
+then $v_1 - v_2 = c$ for some real constant $c$.
+\end{infobox}
+
+\textbf{Proof sketch.} Since both $v_1$ and $v_2$ satisfy the C-R equations with the same
+$u$, the function $w = v_1 - v_2$ satisfies $(w)_x = 0$ and $(w)_y = 0$ throughout $D$.
+In a connected open set, a function with zero gradient is constant. Hence $v_1-v_2=c$.
+
+\medskip
+\textbf{Practical consequence.} When we integrate to find $v$, the arbitrary real constant
+$c$ is unavoidable and acceptable --- it represents the freedom to shift the level curves
+of $v$ without changing the analytic function's analyticity.
+
+\begin{learnbox}{Uniqueness Takeaway}
+Every harmonic conjugate of $u$ in a connected domain $D$ differs from every other harmonic
+conjugate of $u$ by at most a real constant. We write $v+c$, $c\in\mathbb{R}$.
+\end{learnbox}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Worked Examples}
+
+% ── Example 1 ─────────────────────────────────────────────────────────────────
+\subsection*{Example 1: $u = x^2 - y^2$}
+
+\textbf{Given:} $u(x,y)=x^2-y^2$. Find the harmonic conjugate $v$.
+
+\medskip
+\textbf{Step 1 --- Check harmonicity:}
+\[
+  u_{xx} = 2,\quad u_{yy}=-2,\quad u_{xx}+u_{yy}=0.\quad\checkmark
+\]
+
+\textbf{Step 2 --- Compute partial derivatives:}
+\[
+  u_x = 2x,\qquad u_y = -2y.
+\]
+
+\textbf{Step 3 --- Integrate $u_x$ w.r.t.\ $y$:}
+\[
+  v = \int 2x\,dy + \phi(x) = 2xy + \phi(x).
+\]
+
+\textbf{Step 4 --- Differentiate w.r.t.\ $x$:}
+\[
+  v_x = 2y + \phi'(x).
+\]
+
+\textbf{Step 5 --- Apply $v_x = -u_y$:}
+\[
+  2y+\phi'(x)=-(-2y)=2y \implies \phi'(x)=0 \implies \phi(x)=c.
+\]
+
+\textbf{Result:}
+\[
+  \boxed{v(x,y)=2xy+c,\qquad f(z)=(x^2-y^2)+i(2xy)+ic=z^2+ic.}
+\]
+
+\begin{learnbox}{Example 1 Key Result}
+$u=x^2-y^2$ leads to $v=2xy+c$. The analytic function is $f(z)=z^2+ic$. This is the
+classic example showing the real and imaginary parts of $z^2$.
+\end{learnbox}
+
+% ── Example 2 ─────────────────────────────────────────────────────────────────
+\subsection*{Example 2: $u = e^x\cos y$}
+
+\textbf{Given:} $u(x,y)=e^x\cos y$. Find $v$ and $f(z)$.
+
+\medskip
+\textbf{Step 1:}
+\[
+  u_{xx}=e^x\cos y,\quad u_{yy}=-e^x\cos y,\quad u_{xx}+u_{yy}=0.\quad\checkmark
+\]
+
+\textbf{Step 2:}
+\[
+  u_x = e^x\cos y,\qquad u_y = -e^x\sin y.
+\]
+
+\textbf{Step 3:}
+\[
+  v = \int e^x\cos y\,dy + \phi(x) = e^x\sin y + \phi(x).
+\]
+
+\textbf{Step 4:}
+\[
+  v_x = e^x\sin y + \phi'(x).
+\]
+
+\textbf{Step 5:}
+\[
+  e^x\sin y+\phi'(x)= -(-e^x\sin y)=e^x\sin y \implies \phi'(x)=0 \implies \phi(x)=c.
+\]
+
+\textbf{Result:}
+\[
+  \boxed{v=e^x\sin y+c,\qquad f(z)=e^x(\cos y+i\sin y)+ic=e^z+ic.}
+\]
+
+\begin{learnbox}{Example 2 Key Result}
+$u=e^x\cos y$ gives $v=e^x\sin y+c$ and $f(z)=e^z+ic$. Real and imaginary parts of
+$e^z$ are $e^x\cos y$ and $e^x\sin y$.
+\end{learnbox}
+
+% ── Example 3 ─────────────────────────────────────────────────────────────────
+\subsection*{Example 3: $u = \dfrac{x}{x^2+y^2}$}
+
+\textbf{Given:} $u=\dfrac{x}{x^2+y^2}$ (defined for $z\neq0$). Find $v$.
+
+\medskip
+\textbf{Step 1 --- Check harmonicity:} Let $r^2=x^2+y^2$.
+\[
+  u_x = \frac{(x^2+y^2)-x\cdot 2x}{(x^2+y^2)^2}=\frac{y^2-x^2}{r^4},\qquad
+  u_y = \frac{-2xy}{r^4}.
+\]
+\[
+  u_{xx}=\frac{-2x(y^2-x^2)\cdot2/r^4 - (y^2-x^2)\cdot 4x/r^4}{1}
+  \quad\text{(detailed computation yields }u_{xx}+u_{yy}=0\text{).}\quad\checkmark
+\]
+
+\textbf{Step 3:}
+\[
+  v = \int \frac{y^2-x^2}{(x^2+y^2)^2}\,dy + \phi(x).
+\]
+Use the standard integral result for this form:
+\[
+  \int \frac{y^2-x^2}{(x^2+y^2)^2}\,dy = -\frac{y}{x^2+y^2}+\phi(x).
+\]
+
+\textbf{Step 4--5:}
+\[
+  v_x = \frac{2xy}{(x^2+y^2)^2}+\phi'(x).
+\]
+\[
+  -u_y = \frac{2xy}{(x^2+y^2)^2} \implies \phi'(x)=0 \implies \phi(x)=c.
+\]
+
+\textbf{Result:}
+\[
+  \boxed{v=-\frac{y}{x^2+y^2}+c.}
+\]
+Note: $u+iv = \dfrac{x-iy}{x^2+y^2}=\dfrac{\overline{z}}{|z|^2}=\dfrac{1}{z}+ic$,
+confirming $f(z)=1/z+ic$.
+
+\begin{learnbox}{Example 3 Key Result}
+$u=x/(x^2+y^2)$ gives $v=-y/(x^2+y^2)+c$ and $f(z)=1/z+ic$. This is a rational
+function with a singularity at the origin.
+\end{learnbox}
+
+% ── Example 4 ─────────────────────────────────────────────────────────────────
+\subsection*{Example 4: $u = x^3 - 3xy^2$}
+
+\textbf{Given:} $u=x^3-3xy^2$. Find $v$ and $f(z)$.
+
+\medskip
+\textbf{Step 1:}
+\[
+  u_{xx}=6x,\quad u_{yy}=-6x,\quad u_{xx}+u_{yy}=0.\quad\checkmark
+\]
+
+\textbf{Step 2:}
+\[
+  u_x=3x^2-3y^2,\qquad u_y=-6xy.
+\]
+
+\textbf{Step 3:}
+\[
+  v=\int(3x^2-3y^2)\,dy+\phi(x)=3x^2y-y^3+\phi(x).
+\]
+
+\textbf{Step 4--5:}
+\[
+  v_x=6xy+\phi'(x)=-u_y=6xy \implies \phi'(x)=0 \implies \phi(x)=c.
+\]
+
+\textbf{Result:}
+\[
+  \boxed{v=3x^2y-y^3+c,\qquad f(z)=(x^3-3xy^2)+i(3x^2y-y^3)+ic=z^3+ic.}
+\]
+
+\begin{learnbox}{Example 4 Key Result}
+$u=x^3-3xy^2$ (real part of $z^3$) gives $v=3x^2y-y^3+c$.
+\end{learnbox}
+
+% ── Example 5 ─────────────────────────────────────────────────────────────────
+\subsection*{Example 5: Given $v = e^x\sin y$, find $u$}
+
+\textbf{Given:} $v(x,y)=e^x\sin y$. Find $u$.
+
+\medskip
+\textbf{Step 1:}
+\[
+  v_{xx}=e^x\sin y,\quad v_{yy}=-e^x\sin y,\quad v_{xx}+v_{yy}=0.\quad\checkmark
+\]
+
+\textbf{Step 2:}
+\[
+  v_x=e^x\sin y,\qquad v_y=e^x\cos y.
+\]
+
+\textbf{Step 3 --- Use $u_x=v_y$:}
+\[
+  u=\int e^x\cos y\,dx+\psi(y)=e^x\cos y+\psi(y).
+\]
+
+\textbf{Step 4--5 --- Use $u_y=-v_x$:}
+\[
+  u_y=-e^x\sin y+\psi'(y)=-v_x=-e^x\sin y \implies \psi'(y)=0 \implies \psi(y)=c.
+\]
+
+\textbf{Result:}
+\[
+  \boxed{u=e^x\cos y+c,\qquad f(z)=e^z+c.}
+\]
+
+\begin{learnbox}{Example 5 Key Result}
+Starting from $v=e^x\sin y$ recovers $u=e^x\cos y+c$, confirming $f(z)=e^z+c$.
+\end{learnbox}
+
+% ── Example 6 ─────────────────────────────────────────────────────────────────
+\subsection*{Example 6: Checking Harmonicity First --- $u = x^2 + y^2$}
+
+\textbf{Given:} $u=x^2+y^2$. Can a harmonic conjugate exist?
+
+\medskip
+\textbf{Step 1:}
+\[
+  u_{xx}=2,\quad u_{yy}=2,\quad u_{xx}+u_{yy}=4\neq0.
+\]
+
+Since $u$ is \textbf{not harmonic}, no harmonic conjugate exists.
+
+\begin{learnbox}{Example 6 Key Result}
+Always check $\nabla^2 u=0$ first. If the check fails, stop immediately --- there is no
+analytic $f(z)=u+iv$ for this $u$.
+\end{learnbox}
+
+% ── Example 7 ─────────────────────────────────────────────────────────────────
+\subsection*{Example 7: $u = \sin x\cosh y$}
+
+\textbf{Given:} $u=\sin x\cosh y$. Find $v$.
+
+\medskip
+\textbf{Step 1:}
+\[
+  u_{xx}=-\sin x\cosh y,\quad u_{yy}=\sin x\cosh y,\quad u_{xx}+u_{yy}=0.\quad\checkmark
+\]
+
+\textbf{Step 2:}
+\[
+  u_x=\cos x\cosh y,\qquad u_y=\sin x\sinh y.
+\]
+
+\textbf{Step 3:}
+\[
+  v=\int\cos x\cosh y\,dy+\phi(x)=\cos x\sinh y+\phi(x).
+\]
+
+\textbf{Step 4--5:}
+\[
+  v_x=-\sin x\sinh y+\phi'(x)=-u_y=-\sin x\sinh y \implies \phi'(x)=0 \implies \phi(x)=c.
+\]
+
+\textbf{Result:}
+\[
+  \boxed{v=\cos x\sinh y+c,\qquad f(z)=\sin z+c.}
+\]
+
+\begin{learnbox}{Example 7 Key Result}
+$u=\sin x\cosh y$, $v=\cos x\sinh y+c$, $f(z)=\sin z+c$. The hyperbolic functions arise
+naturally from the trigonometric functions of a complex argument.
+\end{learnbox}
+
+% ── Example 8 ─────────────────────────────────────────────────────────────────
+\subsection*{Example 8: $u = \ln\!\sqrt{x^2+y^2}$}
+
+\textbf{Given:} $u=\ln\sqrt{x^2+y^2}=\tfrac{1}{2}\ln(x^2+y^2)$ for $z\neq0$. Find $v$.
+
+\medskip
+\textbf{Step 1:}
+\[
+  u_x=\frac{x}{x^2+y^2},\quad u_y=\frac{y}{x^2+y^2}.
+\]
+\[
+  u_{xx}=\frac{y^2-x^2}{(x^2+y^2)^2},\quad u_{yy}=\frac{x^2-y^2}{(x^2+y^2)^2},
+  \quad u_{xx}+u_{yy}=0.\quad\checkmark
+\]
+
+\textbf{Step 3:}
+\[
+  v=\int\frac{x}{x^2+y^2}\,dy+\phi(x)=\arctan\!\left(\frac{y}{x}\right)+\phi(x).
+\]
+
+\textbf{Step 4--5:}
+\[
+  v_x=\frac{-y/x^2}{1+(y/x)^2}+\phi'(x)=\frac{-y}{x^2+y^2}+\phi'(x).
+\]
+\[
+  -u_y=-\frac{y}{x^2+y^2} \implies \phi'(x)=0 \implies \phi(x)=c.
+\]
+
+\textbf{Result:}
+\[
+  \boxed{v=\arctan\!\left(\frac{y}{x}\right)+c=\arg(z)+c,
+  \qquad f(z)=\ln|z|+i\arg(z)+ic=\operatorname{Log}z+ic.}
+\]
+
+\begin{learnbox}{Example 8 Key Result}
+$u=\ln|z|$ gives $v=\arg(z)+c$. The analytic function is the principal logarithm
+$\operatorname{Log}z$. This connects the geometric notion of argument to the harmonic
+conjugate.
+\end{learnbox}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Procedure Summary Table (MANDATORY UPGRADE)}
+
+\begin{center}
+\begin{tabular}{@{}>{\bfseries}c p{5cm} p{6cm}@{}}
+\toprule
+Step & What to Do & Why It Is Needed \\
+\midrule
+1 & Verify $u_{xx}+u_{yy}=0$ &
+    Ensures a harmonic conjugate actually exists; skip if given, verify if not stated \\
+\midrule
+2 & Compute $u_x$ and $u_y$ &
+    These feed directly into the two C-R equations \\
+\midrule
+3 & Set $v_y=u_x$; integrate w.r.t.\ $y$ &
+    One C-R equation gives $v$ as an integral in $y$; the ``constant'' is $\phi(x)$ \\
+\midrule
+4 & Differentiate result w.r.t.\ $x$ &
+    Prepares $v_x$ for comparison with the second C-R equation \\
+\midrule
+5 & Apply $v_x=-u_y$; solve for $\phi'(x)$ &
+    The second C-R equation determines the unknown function $\phi(x)$ \\
+\midrule
+6 & Integrate $\phi'(x)$ to get $\phi(x)=c$ (or function) &
+    Recovers $\phi(x)$ fully; $c$ is the additive freedom \\
+\midrule
+7 & Write $v=(\text{result from Step 3})+\phi(x)$ &
+    Assembles the final harmonic conjugate \\
+\midrule
+8 & (Optional) Form $f(z)=u+iv$ and express in terms of $z$ &
+    Confirms correctness and gives the analytic function in closed form \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Excel Example (MANDATORY)}
+
+\textbf{Scenario:} Numerically verify that $u=x^2-y^2$ and $v=2xy$ satisfy the C-R
+equations by computing finite-difference approximations of the partial derivatives.
+
+\medskip
+\textbf{Spreadsheet layout} (start in cell A1):
+
+\begin{center}
+\begin{tabular}{@{}ccccccccc@{}}
+\toprule
+Col A & Col B & Col C & Col D & Col E & Col F & Col G & Col H \\
+$x$ & $y$ & $u=A^2-B^2$ & $v=2AB$ & $u_x\approx$ & $u_y\approx$ & $v_x\approx$ & $v_y\approx$ \\
+\midrule
+1.0 & 1.0 & \texttt{=A2\^{}2-B2\^{}2} & \texttt{=2*A2*B2} & \texttt{=2*A2} & \texttt{=-2*B2} & \texttt{=2*B2} & \texttt{=2*A2} \\
+2.0 & 0.5 & \texttt{=A3\^{}2-B3\^{}2} & \texttt{=2*A3*B3} & \texttt{=2*A3} & \texttt{=-2*B3} & \texttt{=2*B3} & \texttt{=2*A3} \\
+3.0 & 2.0 & \texttt{=A4\^{}2-B4\^{}2} & \texttt{=2*A4*B4} & \texttt{=2*A4} & \texttt{=-2*B4} & \texttt{=2*B4} & \texttt{=2*A4} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Verification columns to add:}
+
+\begin{center}
+\begin{tabular}{@{}cll@{}}
+\toprule
+Column & Header & Formula \\
+\midrule
+Col I & $u_x - v_y$ (should be 0) & \texttt{=E2-H2} \\
+Col J & $u_y + v_x$ (should be 0) & \texttt{=F2+G2} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Sample computed values:}
+
+\begin{center}
+\begin{tabular}{@{}cccccccc@{}}
+\toprule
+$x$ & $y$ & $u$ & $v$ & $u_x$ & $u_y$ & $v_x$ & $v_y$ \\
+\midrule
+1.0 & 1.0 & 0.00 & 2.00 & 2.00 & $-2.00$ & 2.00 & 2.00 \\
+2.0 & 0.5 & 3.75 & 2.00 & 4.00 & $-1.00$ & 1.00 & 4.00 \\
+3.0 & 2.0 & 5.00 & 12.00 & 6.00 & $-4.00$ & 4.00 & 6.00 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Observation:} Column I ($u_x-v_y$) and Column J ($u_y+v_x$) are identically
+zero for all rows, confirming the C-R equations hold numerically.
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Python Example (MANDATORY)}
+
+\textbf{Task:} Use SymPy to (1) check harmonicity of a given $u$, (2) derive the harmonic
+conjugate $v$ symbolically, and (3) form $f(z)=u+iv$.
+
+\begin{lstlisting}[language=Python,caption={Harmonic Conjugate via SymPy}]
+import sympy as sp
+
+x, y, c = sp.symbols('x y c', real=True)
+
+# ── Example: u = x^2 - y^2 ──────────────────────────────────────────────────
+u = x**2 - y**2
+
+# Step 1: Check harmonicity
+laplacian_u = sp.diff(u, x, 2) + sp.diff(u, y, 2)
+print("Laplacian of u:", laplacian_u)  # Expected: 0
+
+# Step 2: Partial derivatives
+u_x = sp.diff(u, x)
+u_y = sp.diff(u, y)
+print("u_x =", u_x)  # 2*x
+print("u_y =", u_y)  # -2*y
+
+# Step 3: Integrate u_x w.r.t. y  =>  v = integral(u_x, y) + phi(x)
+phi = sp.Function('phi')
+v_partial = sp.integrate(u_x, y)
+print("v (partial) =", v_partial)  # 2*x*y
+
+# Step 4: Differentiate w.r.t. x and apply v_x = -u_y
+# v_x = diff(v_partial, x) + phi'(x) = -u_y
+phi_x = sp.Symbol('phi_x')  # represents phi'(x)
+eq = sp.Eq(sp.diff(v_partial, x) + phi_x, -u_y)
+print("Equation for phi'(x):", eq)   # phi_x = 0
+
+phi_prime = sp.solve(eq, phi_x)[0]
+print("phi'(x) =", phi_prime)  # 0
+
+# Step 5: Integrate phi'(x)
+phi_val = sp.integrate(phi_prime, x)
+print("phi(x) =", phi_val, "+ c")  # 0 + c
+
+# Step 6: Complete harmonic conjugate
+v = v_partial + phi_val + c
+print("v(x,y) =", v)  # 2*x*y + c
+
+# Step 7: Analytic function
+z = x + sp.I * y
+f_z = u + sp.I * v
+f_simplified = sp.expand(f_z)
+print("f(z) = u + iv =", f_simplified)  # x**2 - y**2 + 2*I*x*y + I*c
+
+# ── Bonus: verify with a second example u = e^x * cos(y) ───────────────────
+u2 = sp.exp(x) * sp.cos(y)
+lap2 = sp.diff(u2, x, 2) + sp.diff(u2, y, 2)
+print("\nLaplacian of e^x*cos(y):", sp.simplify(lap2))  # 0
+
+u2_x = sp.diff(u2, x)
+v2_partial = sp.integrate(u2_x, y)
+print("v2 (partial) =", v2_partial)   # exp(x)*sin(y)
+
+phi2_prime = sp.solve(sp.Eq(sp.diff(v2_partial, x) + phi_x, -sp.diff(u2, y)), phi_x)[0]
+print("phi2'(x) =", phi2_prime)  # 0
+
+v2 = v2_partial + phi2_prime + c
+print("v2 =", v2)   # exp(x)*sin(y) + c
+print("f2(z) = e^z + c (analytic function)")
+\end{lstlisting}
+
+\textbf{Expected output (summary):}
+\begin{verbatim}
+Laplacian of u: 0
+u_x = 2*x
+u_y = -2*y
+v (partial) = 2*x*y
+phi'(x) = 0
+phi(x) = 0 + c
+v(x,y) = 2*x*y + c
+f(z) = u + iv = x**2 - y**2 + 2*I*x*y + I*c
+
+Laplacian of e^x*cos(y): 0
+v2 (partial) = exp(x)*sin(y)
+phi2'(x) = 0
+v2 = exp(x)*sin(y) + c
+f2(z) = e^z + c (analytic function)
+\end{verbatim}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Viva Questions}
+
+\begin{enumerate}[label=\textbf{Q\arabic*.}]
+
+\item \textbf{What is the harmonic conjugate of a function $u$?}\\
+      The harmonic conjugate of $u$ is a function $v$ such that $v_y=u_x$ and $v_x=-u_y$
+      (the Cauchy--Riemann equations), making $f(z)=u+iv$ analytic.
+
+\item \textbf{Is a harmonic conjugate always unique?}\\
+      No. The harmonic conjugate is unique \emph{only up to an additive real constant}.
+      If $v$ is a harmonic conjugate of $u$, so is $v+c$ for any $c\in\mathbb{R}$.
+
+\item \textbf{What must you check before finding a harmonic conjugate?}\\
+      You must verify that $u$ satisfies Laplace's equation: $u_{xx}+u_{yy}=0$ in the
+      domain. If $u$ is not harmonic, no harmonic conjugate exists.
+
+\item \textbf{In the method using C-R equations, why does an unknown function $\phi(x)$
+      appear rather than a plain constant?}\\
+      Because we integrate $v_y=u_x$ with respect to $y$, the ``constant'' of integration
+      can depend on the remaining variable $x$. It is determined by applying the second
+      C-R equation $v_x=-u_y$.
+
+\item \textbf{If $v$ is the harmonic conjugate of $u$, is $u$ the harmonic conjugate of
+      $v$?}\\
+      No. If $f=u+iv$ is analytic, then $-u$ is the harmonic conjugate of $v$. The roles
+      of $u$ and $v$ are not symmetric.
+
+\item \textbf{What is the harmonic conjugate of $u=\ln|z|$?}\\
+      The harmonic conjugate is $v=\arg(z)+c$, so $f(z)=\operatorname{Log}z+ic$.
+
+\item \textbf{Does a harmonic function always have a harmonic conjugate?}\\
+      In a simply connected domain, yes. In a multiply connected domain (e.g., a
+      punctured disc), a harmonic conjugate may not exist globally (e.g., $u=\ln|z|$
+      has no single-valued harmonic conjugate around a loop encircling the origin).
+
+\item \textbf{What is the geometric relationship between the level curves of $u$ and $v$?}\\
+      The level curves of $u$ (equipotentials) and the level curves of $v$ (stream lines)
+      are orthogonal families of curves wherever $\nabla u\neq\mathbf{0}$.
+
+\end{enumerate}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Descriptive Questions}
+
+\begin{enumerate}[label=\textbf{D\arabic*.}]
+
+\item Define harmonic conjugate. State and prove the uniqueness theorem for harmonic
+      conjugates in a connected domain. Illustrate with the pair $u=x^2-y^2$,
+      $v=2xy+c$.
+
+\item Derive the step-by-step procedure for finding the harmonic conjugate of a given
+      harmonic function $u(x,y)$ using the Cauchy--Riemann equations. Apply the method
+      to find the harmonic conjugate of $u=e^x\cos y$ and write down the corresponding
+      analytic function $f(z)$.
+
+\item Explain how to find $u$ when $v$ is given. Use $v=2xy+3x$ as an example: verify
+      harmonicity, find $u$, and write $f(z)$.
+
+\item Find the harmonic conjugate of $u=\ln\sqrt{x^2+y^2}$ for $z\neq0$. Identify the
+      resulting analytic function and discuss the domain of validity.
+
+\item A student claims that $u=x^2+y^2$ has a harmonic conjugate. Identify the error
+      in this claim, and explain what additional conditions on $u$ are necessary for a
+      harmonic conjugate to exist. Give two examples of functions that do satisfy these
+      conditions.
+
+\end{enumerate}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Practice Problems}
+
+\begin{enumerate}[label=\textbf{P\arabic*.}]
+
+\item Find the harmonic conjugate of $u=2xy+x$.\\
+      \textit{Hint:} $u_x=2y+1$; integrate w.r.t.\ $y$; expected $v=y^2-x^2+y+c$.
+
+\item Given $v=x^3y-xy^3+y$, verify $v$ is harmonic and find $u$.\\
+      \textit{Hint:} Use $u_x=v_y$; expected $u=x^2y^2-\tfrac{1}{2}(x^4+y^4)/2+\cdots$;
+      work step by step.
+
+\item Find the harmonic conjugate of $u=\cos x\cosh y$.\\
+      \textit{Hint:} $u_x=-\sin x\cosh y$; integrate w.r.t.\ $y$; expected
+      $v=-\sin x\sinh y+c$; $f(z)=\cos z+c$.
+
+\item Show that $u=x/(x^2+y^2)$ is harmonic and find $v$.\\
+      \textit{Hint:} $v=-y/(x^2+y^2)+c$; $f(z)=1/z+ic$.
+
+\item Given $u=e^{2x}\cos 2y$, find the harmonic conjugate and the analytic function.\\
+      \textit{Hint:} $v=e^{2x}\sin 2y+c$; $f(z)=e^{2z}+c$.
+
+\item Verify that $u=x^4-6x^2y^2+y^4$ is harmonic and find its harmonic conjugate.\\
+      \textit{Hint:} $u=\operatorname{Re}(z^4)$; expected $v=4x^3y-4xy^3+c=\operatorname{Im}(z^4)+c$.
+
+\end{enumerate}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{MCQs}
+
+\begin{enumerate}[label=\textbf{MCQ\arabic*.}]
+
+\item If $u=x^2-y^2$, the harmonic conjugate $v$ is:
+      \begin{enumerate}[label=(\alph*)]
+        \item $x^2+y^2+c$
+        \item $-2xy+c$
+        \item \textbf{$2xy+c$}
+        \item $x^2-y^2+c$
+      \end{enumerate}
+      \textit{Explanation:} $v_y=u_x=2x \Rightarrow v=2xy+\phi(x)$; $\phi'(x)=0$ gives
+      $v=2xy+c$.
+
+\item The harmonic conjugate is unique:
+      \begin{enumerate}[label=(\alph*)]
+        \item Always, with no freedom
+        \item Up to a multiplicative constant
+        \item \textbf{Up to an additive real constant}
+        \item Only if the domain is multiply connected
+      \end{enumerate}
+      \textit{Explanation:} Any two harmonic conjugates of $u$ differ by a real constant,
+      as shown by the uniqueness theorem.
+
+\item If $u$ is harmonic in a simply connected domain, which of the following must hold
+      for $v$ to be its harmonic conjugate?
+      \begin{enumerate}[label=(\alph*)]
+        \item $v_x=u_x$ and $v_y=u_y$
+        \item $v_x=u_y$ and $v_y=u_x$
+        \item \textbf{$v_x=-u_y$ and $v_y=u_x$}
+        \item $v_x=u_y$ and $v_y=-u_x$
+      \end{enumerate}
+      \textit{Explanation:} These are precisely the Cauchy--Riemann equations.
+
+\item The harmonic conjugate of $u=e^x\cos y$ is:
+      \begin{enumerate}[label=(\alph*)]
+        \item $e^x\cos y+c$
+        \item $-e^x\sin y+c$
+        \item $e^y\sin x+c$
+        \item \textbf{$e^x\sin y+c$}
+      \end{enumerate}
+      \textit{Explanation:} Integrating $v_y=u_x=e^x\cos y$ with respect to $y$ gives
+      $v=e^x\sin y+\phi(x)$; the second C-R equation forces $\phi'(x)=0$.
+
+\item Which of the following functions does \textbf{not} have a harmonic conjugate?
+      \begin{enumerate}[label=(\alph*)]
+        \item $u=\ln\sqrt{x^2+y^2}$
+        \item $u=x^2-y^2$
+        \item \textbf{$u=x^2+y^2$}
+        \item $u=e^x\cos y$
+      \end{enumerate}
+      \textit{Explanation:} $\nabla^2(x^2+y^2)=4\neq0$, so it is not harmonic and has no
+      harmonic conjugate.
+
+\end{enumerate}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Common Mistakes}
+
+\begin{mistakebox}{Frequent Errors When Finding Harmonic Conjugates}
+\begin{tabular}{@{}>{\bfseries}p{4cm} p{5cm} p{5cm}@{}}
+\toprule
+Mistake & Example of the Error & Correct Approach \\
+\midrule
+Forgetting the arbitrary constant &
+  Writing $v=2xy$ for $u=x^2-y^2$ &
+  Always append $+c$: $v=2xy+c$ \\
+\midrule
+Using a plain constant instead of $\phi(x)$ &
+  Writing $v=2xy+A$ without deriving $A$ &
+  Use $\phi(x)$ (function of $x$); determine by the second C-R equation \\
+\midrule
+Sign error in C-R equation &
+  Writing $v_x=u_y$ instead of $v_x=-u_y$ &
+  The second C-R equation is $v_x=-u_y$; the minus sign is essential \\
+\midrule
+Not checking harmonicity first &
+  Attempting to find conjugate of $u=x^2+y^2$ &
+  Always verify $u_{xx}+u_{yy}=0$ before starting \\
+\midrule
+Integrating w.r.t.\ wrong variable &
+  Integrating $u_x$ w.r.t.\ $x$ instead of $y$ &
+  $v_y=u_x$ means integrate $u_x$ w.r.t.\ $y$ \\
+\midrule
+Neglecting that $\phi$ may be non-constant &
+  Assuming $\phi'(x)=0$ before computing it &
+  Compute $v_x$, set equal to $-u_y$, and \emph{then} solve for $\phi'(x)$ \\
+\bottomrule
+\end{tabular}
+\end{mistakebox}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Quick Recap}
+
+\begin{learnbox}{Quick Recap --- Topic 07: Harmonic Conjugate}
+\begin{itemize}[leftmargin=1.5em]
+  \item $v$ is the harmonic conjugate of $u$ if and only if $v_y=u_x$ and $v_x=-u_y$
+        (C-R equations hold).
+  \item Prerequisite: $u_{xx}+u_{yy}=0$; if $\nabla^2u\neq0$, no conjugate exists.
+  \item Finding $v$ from $u$: integrate $v_y=u_x$ w.r.t.\ $y$, introduce $\phi(x)$,
+        apply $v_x=-u_y$ to find $\phi'(x)$, integrate once more.
+  \item Finding $u$ from $v$: integrate $u_x=v_y$ w.r.t.\ $x$, introduce $\psi(y)$,
+        apply $u_y=-v_x$ to find $\psi'(y)$.
+  \item Uniqueness: the harmonic conjugate is unique up to an additive real constant $c$.
+  \item Key pairs: $z^n$, $e^z$, $\sin z$, $\cos z$, $\operatorname{Log}z$, $1/z$ each
+        give textbook examples of the $u$--$v$ relationship.
+  \item Level curves of $u$ and $v$ are orthogonal wherever $\nabla u\neq\mathbf{0}$.
+  \item Every worked solution must include the arbitrary constant --- omitting it is a
+        standard examination error.
+\end{itemize}
+\end{learnbox}
+
+\end{document}
