@@ -1,0 +1,989 @@
+\documentclass[12pt,a4paper]{article}
+
+% ── Packages ──────────────────────────────────────────────────────────────────
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usepackage{array}
+
+% ── tcolorbox environments ─────────────────────────────────────────────────────
+\newtcolorbox{curiositybox}[1]{colback=yellow!10, colframe=orange!80!black, fonttitle=\bfseries, title=#1, breakable}
+\newtcolorbox{infobox}[1]{colback=blue!5, colframe=blue!60!black, fonttitle=\bfseries, title=#1, breakable}
+\newtcolorbox{mistakebox}[1]{colback=red!5, colframe=red!60!black, fonttitle=\bfseries, title=#1, breakable}
+\newtcolorbox{learnbox}[1]{colback=green!5, colframe=green!60!black, fonttitle=\bfseries, title=#1, breakable}
+
+% ── lstlisting (Python) ────────────────────────────────────────────────────────
+\lstset{language=Python, basicstyle=\ttfamily\small, keywordstyle=\color{blue},
+        commentstyle=\color{gray}, stringstyle=\color{red},
+        showstringspaces=false, breaklines=true, frame=single}
+
+% ── fancyhdr ──────────────────────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{Topic 04: Cauchy-Riemann Equations}
+\rhead{Unit I --- Complex Variables}
+\cfoot{\thepage}
+
+% ── Title ─────────────────────────────────────────────────────────────────────
+\title{\textbf{Topic 04: Cauchy-Riemann Equations}\\
+\large Unit I --- Complex Variable: Differentiation\\
+Complex Variables and Special Functions\\
+JNTUA College of Engineering (Autonomous)}
+\date{}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+% ── Opening Hook ──────────────────────────────────────────────────────────────
+\begin{curiositybox}{Hook}
+Here is the surprise of complex analysis: to be differentiable, a complex function cannot let its real and imaginary parts behave independently. They must satisfy two beautiful coupling equations. Those are the Cauchy-Riemann equations.
+\end{curiositybox}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Why We Need C-R Equations}
+% ══════════════════════════════════════════════════════════════════════════════
+
+In the previous topic we saw that the complex derivative
+\[
+  f'(z) = \lim_{\Delta z \to 0} \frac{f(z+\Delta z)-f(z)}{\Delta z}
+\]
+must be the same regardless of the direction in which $\Delta z \to 0$.
+For a real function $g(x)$ there is only one direction (left or right), so the two-sided limit suffices.
+For a complex function the point $z_0$ is approached from infinitely many directions in the complex plane, and the limit must agree for \emph{every} direction.
+
+\begin{infobox}{Path-Independence Requirement}
+A function $f(z)$ is differentiable at $z_0$ if and only if the limit
+\[
+  \lim_{\Delta z \to 0} \frac{f(z_0+\Delta z)-f(z_0)}{\Delta z}
+\]
+is independent of the path (direction) along which $\Delta z \to 0$.
+This stringent requirement forces the real and imaginary parts of $f$ to be coupled in a precise way --- the Cauchy-Riemann (C-R) equations.
+\end{infobox}
+
+\medskip
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Setting} & \textbf{Directions for limit} & \textbf{Constraint on function} \\
+\midrule
+Real calculus $f:\mathbb{R}\to\mathbb{R}$ & Left or right on real line & Left derivative $=$ right derivative \\
+Complex calculus $f:\mathbb{C}\to\mathbb{C}$ & Every direction in $\mathbb{C}$ & C-R equations must hold \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{learnbox}{Key Takeaway}
+The demand that $\Delta z \to 0$ from \emph{any} direction forces the C-R equations. They are not a convention---they are a logical necessity of complex differentiability.
+\end{learnbox}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Setting Up $f(z)=u(x,y)+iv(x,y)$}
+% ══════════════════════════════════════════════════════════════════════════════
+
+Let $z = x + iy$ and write
+\[
+  f(z) = u(x,y) + i\,v(x,y),
+\]
+where $u$ and $v$ are real-valued functions of two real variables $x$ and $y$.
+
+\begin{infobox}{Roles of $u$ and $v$}
+\begin{itemize}[noitemsep]
+  \item $u(x,y) = \operatorname{Re}(f(z))$ --- the \textbf{real part} of $f$.
+  \item $v(x,y) = \operatorname{Im}(f(z))$ --- the \textbf{imaginary part} of $f$.
+  \item Everything about the complex function $f$ is encoded in the pair $(u,v)$.
+  \item $x$ and $y$ are the real and imaginary parts of the input $z$, i.e., $x = \operatorname{Re}(z)$, $y = \operatorname{Im}(z)$.
+\end{itemize}
+\end{infobox}
+
+\paragraph{Example decompositions.}
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Function} $f(z)$ & $u(x,y)$ & $v(x,y)$ \\
+\midrule
+$z^2 = (x+iy)^2$ & $x^2 - y^2$ & $2xy$ \\
+$e^z = e^x(\cos y + i\sin y)$ & $e^x\cos y$ & $e^x\sin y$ \\
+$\overline{z} = x - iy$ & $x$ & $-y$ \\
+$z^3 = (x+iy)^3$ & $x^3 - 3xy^2$ & $3x^2y - y^3$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{learnbox}{Key Takeaway}
+Any complex function $f(z)$ can be split into a real part $u$ and an imaginary part $v$, both functions of the real variables $x$ and $y$. The C-R equations will link the partial derivatives of $u$ and $v$.
+\end{learnbox}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Derivation of C-R Equations}
+% ══════════════════════════════════════════════════════════════════════════════
+
+We derive the Cauchy-Riemann equations by computing the derivative limit along two specific directions and requiring the results to agree.
+
+\subsection*{Setup}
+
+Let $z_0 = x_0 + iy_0$ and let $\Delta z = \Delta x + i\,\Delta y$.
+Then
+\[
+  f(z_0+\Delta z) - f(z_0)
+  = \bigl[u(x_0+\Delta x,\,y_0+\Delta y) - u(x_0,y_0)\bigr]
+  + i\bigl[v(x_0+\Delta x,\,y_0+\Delta y) - v(x_0,y_0)\bigr].
+\]
+
+\subsection*{Direction 1: Along the Real Axis ($\Delta y = 0$)}
+
+Set $\Delta y = 0$ so $\Delta z = \Delta x$ (a real number).
+
+\[
+  f'(z_0) = \lim_{\Delta x \to 0}
+  \frac{[u(x_0+\Delta x,\,y_0) - u(x_0,y_0)] + i[v(x_0+\Delta x,\,y_0) - v(x_0,y_0)]}{\Delta x}.
+\]
+
+Splitting real and imaginary parts:
+\[
+  f'(z_0) = \lim_{\Delta x \to 0} \frac{u(x_0+\Delta x,y_0) - u(x_0,y_0)}{\Delta x}
+           + i\lim_{\Delta x \to 0} \frac{v(x_0+\Delta x,y_0) - v(x_0,y_0)}{\Delta x}.
+\]
+
+By the definition of partial derivatives this gives:
+\[
+  \boxed{f'(z_0) = u_x + i\,v_x} \tag{A}
+\]
+where $u_x = \dfrac{\partial u}{\partial x}$ and $v_x = \dfrac{\partial v}{\partial x}$ are evaluated at $(x_0,y_0)$.
+
+\subsection*{Direction 2: Along the Imaginary Axis ($\Delta x = 0$)}
+
+Set $\Delta x = 0$ so $\Delta z = i\,\Delta y$.
+
+\[
+  f'(z_0) = \lim_{\Delta y \to 0}
+  \frac{[u(x_0,\,y_0+\Delta y) - u(x_0,y_0)] + i[v(x_0,\,y_0+\Delta y) - v(x_0,y_0)]}{i\,\Delta y}.
+\]
+
+Note that $\dfrac{1}{i} = -i$, so:
+\[
+  f'(z_0) = -i\lim_{\Delta y \to 0} \frac{u(x_0,y_0+\Delta y)-u(x_0,y_0)}{\Delta y}
+           + \lim_{\Delta y \to 0} \frac{v(x_0,y_0+\Delta y)-v(x_0,y_0)}{\Delta y}.
+\]
+
+This gives:
+\[
+  \boxed{f'(z_0) = v_y - i\,u_y} \tag{B}
+\]
+where $u_y = \dfrac{\partial u}{\partial y}$ and $v_y = \dfrac{\partial v}{\partial y}$.
+
+\subsection*{Equating (A) and (B)}
+
+Since both (A) and (B) must equal the same limit $f'(z_0)$, we equate real and imaginary parts:
+\[
+  u_x + i\,v_x = v_y - i\,u_y.
+\]
+
+\textbf{Real parts equal:}
+\[
+  u_x = v_y.
+\]
+\textbf{Imaginary parts equal:}
+\[
+  v_x = -u_y, \quad \text{i.e.,} \quad u_y = -v_x.
+\]
+
+\begin{infobox}{Cauchy-Riemann Equations (Cartesian Form)}
+If $f(z) = u(x,y) + i\,v(x,y)$ is differentiable at $z_0 = x_0+iy_0$, then:
+\[
+  \boxed{u_x = v_y} \qquad \text{and} \qquad \boxed{u_y = -v_x}
+\]
+at the point $(x_0, y_0)$.  These are the \textbf{Cauchy-Riemann (C-R) equations}.
+\end{infobox}
+
+\begin{learnbox}{Key Takeaway}
+The C-R equations arise by requiring the derivative to be path-independent. They link the ``horizontal'' partial derivatives to the ``vertical'' partial derivatives in a precise way.
+\end{learnbox}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Interpretation of the Equations}
+% ══════════════════════════════════════════════════════════════════════════════
+
+\begin{infobox}{Conceptual Meaning}
+\begin{enumerate}[noitemsep]
+  \item \textbf{Rotation by $90^\circ$}: If you rotate the gradient vector of $u$ by $90^\circ$ counterclockwise, you obtain the gradient vector of $v$. This reflects the conformal (angle-preserving) nature of analytic functions.
+  \item \textbf{Coupling}: $u$ and $v$ are not independent. Knowing $u$ (together with a boundary value) determines $v$ up to a constant, and vice versa.
+  \item \textbf{Incompressibility + Irrotationality}: In fluid flow, if $u$ and $v$ are velocity components, the C-R equations encode that the flow is both incompressible ($u_x + v_y = 0$, using $u_x = v_y$) and irrotational ($v_x - u_y = 0$, using $u_y = -v_x$).
+  \item \textbf{Equal stretching}: Along any direction through $z_0$, the function stretches lengths by $|f'(z_0)|$ uniformly. This is impossible unless C-R holds.
+\end{enumerate}
+\end{infobox}
+
+\medskip
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Equation} & \textbf{Geometric meaning} \\
+\midrule
+$u_x = v_y$ & Rate of change of $u$ rightward $=$ rate of change of $v$ upward \\
+$u_y = -v_x$ & Rate of change of $u$ upward $=$ $-$(rate of change of $v$ rightward) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{learnbox}{Key Takeaway}
+The C-R equations encode a perfect 90-degree rotation relationship between the gradients of $u$ and $v$, and ensure that complex multiplication (differentiation) stretches equally in all directions.
+\end{learnbox}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Necessary vs.\ Sufficient Conditions}
+% ══════════════════════════════════════════════════════════════════════════════
+
+\begin{infobox}{Necessary Condition}
+\textbf{Theorem (Necessary):} If $f(z) = u+iv$ is differentiable at $z_0$, then the four partial derivatives $u_x, u_y, v_x, v_y$ all exist at $z_0$ and satisfy
+\[
+  u_x = v_y, \qquad u_y = -v_x \quad \text{at } z_0.
+\]
+\textbf{Contrapositive:} If C-R fails at any point, then $f$ is not differentiable there.\\
+\textbf{Warning:} The converse is NOT automatic. C-R can hold at a point without differentiability.
+\end{infobox}
+
+\medskip
+
+\begin{infobox}{Sufficient Condition}
+\textbf{Theorem (Sufficient):} If
+\begin{enumerate}[noitemsep]
+  \item $u_x, u_y, v_x, v_y$ exist in a neighbourhood of $z_0$,
+  \item $u_x, u_y, v_x, v_y$ are \textbf{continuous} at $z_0$, and
+  \item the C-R equations $u_x = v_y$ and $u_y = -v_x$ hold at $z_0$,
+\end{enumerate}
+then $f$ is differentiable at $z_0$ and
+\[
+  f'(z_0) = u_x + i\,v_x = v_y - i\,u_y.
+\]
+\end{infobox}
+
+\medskip
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Condition} & \textbf{Implication} & \textbf{Direction} \\
+\midrule
+$f$ differentiable at $z_0$ & C-R holds at $z_0$ & Necessary (one-way) \\
+C-R holds + partials continuous & $f$ differentiable at $z_0$ & Sufficient (one-way) \\
+C-R holds everywhere + partials continuous & $f$ analytic in region & Combined \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{learnbox}{Key Takeaway}
+C-R is necessary but not sufficient on its own. The continuity of partial derivatives in a neighbourhood is the extra ingredient that makes C-R sufficient for differentiability.
+\end{learnbox}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Polar Form of C-R Equations}
+% ══════════════════════════════════════════════════════════════════════════════
+
+When $f(z)$ is expressed in polar coordinates $z = re^{i\theta}$, write
+\[
+  f(re^{i\theta}) = U(r,\theta) + i\,V(r,\theta),
+\]
+where $U$ and $V$ are real-valued functions of $r$ and $\theta$.
+
+\begin{infobox}{Polar C-R Equations}
+If $f(z) = U(r,\theta) + i\,V(r,\theta)$ is differentiable at $z_0 = r_0 e^{i\theta_0}$ (with $r_0 \neq 0$), then:
+\[
+  \boxed{U_r = \frac{1}{r}\,V_\theta} \qquad \text{and} \qquad \boxed{V_r = -\frac{1}{r}\,U_\theta}
+\]
+and the derivative is
+\[
+  f'(z_0) = e^{-i\theta}\left(U_r + i\,V_r\right) = \frac{e^{-i\theta}}{r}\left(V_\theta - i\,U_\theta\right).
+\]
+\end{infobox}
+
+\paragraph{Derivation outline.}
+Using $x = r\cos\theta$, $y = r\sin\theta$, apply the chain rule:
+$u_x = U_r \cos\theta - \dfrac{1}{r}U_\theta \sin\theta$,
+etc., and substitute into the Cartesian C-R equations to obtain the polar form after simplification.
+
+\paragraph{When to use polar form.}
+Use the polar C-R equations when $f(z)$ is given naturally in terms of $r$ and $\theta$, for example $f(z) = \ln|z| + i\arg(z)$, or functions of the form $r^n e^{in\theta}$.
+
+\begin{learnbox}{Key Takeaway}
+The polar C-R equations $U_r = \tfrac{1}{r}V_\theta$ and $V_r = -\tfrac{1}{r}U_\theta$ are entirely equivalent to the Cartesian form; choose whichever matches the form of the given function.
+\end{learnbox}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Formula for the Derivative in Terms of Partial Derivatives}
+% ══════════════════════════════════════════════════════════════════════════════
+
+\begin{infobox}{Equivalent Expressions for $f'(z)$}
+When $f(z)=u+iv$ is differentiable, the derivative can be computed as:
+\begin{align*}
+  f'(z) &= u_x + i\,v_x  \tag{use real-axis approach}\\
+        &= v_y - i\,u_y  \tag{use imaginary-axis approach}\\
+        &= u_x - i\,u_y  \tag{using C-R: $v_x = -u_y$, $v_y = u_x$}\\
+        &= v_y + i\,v_x  \tag{using C-R: $u_x = v_y$, $u_y = -v_x$}
+\end{align*}
+In polar form ($z = re^{i\theta}$):
+\[
+  f'(z) = e^{-i\theta}\left(U_r + i\,V_r\right).
+\]
+\end{infobox}
+
+\begin{learnbox}{Key Takeaway}
+All four Cartesian expressions give the same value when C-R holds. Choose the one whose partials are easiest to compute for the given $u$ or $v$.
+\end{learnbox}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Worked Examples}
+% ══════════════════════════════════════════════════════════════════════════════
+
+\subsection*{Example 1: $f(z) = z^2$}
+
+Write $f(z) = (x+iy)^2 = x^2 - y^2 + 2ixy$.
+
+So $u = x^2 - y^2$ and $v = 2xy$.
+
+\textbf{Step 1: Compute partial derivatives.}
+\[
+  u_x = 2x, \quad u_y = -2y, \quad v_x = 2y, \quad v_y = 2x.
+\]
+
+\textbf{Step 2: Check C-R.}
+\[
+  u_x = 2x = v_y = 2x \quad \checkmark
+\]
+\[
+  u_y = -2y = -v_x = -2y \quad \checkmark
+\]
+
+\textbf{Step 3: Continuity.}
+All partial derivatives are continuous everywhere on $\mathbb{C}$.
+
+\textbf{Step 4: Conclude.}
+$f(z) = z^2$ is differentiable (and analytic) for all $z \in \mathbb{C}$.
+
+\textbf{Step 5: Derivative.}
+\[
+  f'(z) = u_x + i\,v_x = 2x + i(2y) = 2(x+iy) = 2z. \quad \checkmark
+\]
+
+\begin{learnbox}{Example 1 Takeaway}
+$f(z) = z^2$ satisfies C-R everywhere with continuous partials; hence it is entire, with $f'(z) = 2z$ as expected from the power rule.
+\end{learnbox}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection*{Example 2: $f(z) = e^z$}
+
+Write $e^z = e^{x+iy} = e^x\cos y + i\,e^x\sin y$.
+
+So $u = e^x\cos y$ and $v = e^x\sin y$.
+
+\textbf{Step 1: Partial derivatives.}
+\[
+  u_x = e^x\cos y, \quad u_y = -e^x\sin y, \quad v_x = e^x\sin y, \quad v_y = e^x\cos y.
+\]
+
+\textbf{Step 2: Check C-R.}
+\[
+  u_x = e^x\cos y = v_y \quad \checkmark
+\]
+\[
+  u_y = -e^x\sin y = -v_x = -e^x\sin y \quad \checkmark
+\]
+
+\textbf{Step 3: Continuity.}
+All partial derivatives are continuous everywhere.
+
+\textbf{Step 4: Derivative.}
+\[
+  f'(z) = u_x + i\,v_x = e^x\cos y + i\,e^x\sin y = e^x(\cos y + i\sin y) = e^z.
+\]
+
+\begin{learnbox}{Example 2 Takeaway}
+$e^z$ is entire (analytic everywhere) and is its own derivative, just as in real calculus.
+\end{learnbox}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection*{Example 3: $f(z) = \overline{z}$}
+
+Write $\overline{z} = x - iy$.
+
+So $u = x$ and $v = -y$.
+
+\textbf{Step 1: Partial derivatives.}
+\[
+  u_x = 1, \quad u_y = 0, \quad v_x = 0, \quad v_y = -1.
+\]
+
+\textbf{Step 2: Check C-R.}
+\[
+  u_x = 1 \neq v_y = -1 \quad \times
+\]
+
+C-R fails at every point.
+
+\textbf{Step 3: Conclude.}
+$f(z) = \overline{z}$ is nowhere differentiable in $\mathbb{C}$.
+
+\begin{learnbox}{Example 3 Takeaway}
+The conjugate function $\overline{z}$ violates C-R everywhere, so it is nowhere analytic despite being continuous everywhere. Continuity $\neq$ differentiability for complex functions.
+\end{learnbox}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection*{Example 4: $f(z) = x^2 + y^2 + i(2xy)$}
+
+Here $u = x^2 + y^2$ and $v = 2xy$.
+
+\textbf{Step 1: Partial derivatives.}
+\[
+  u_x = 2x, \quad u_y = 2y, \quad v_x = 2y, \quad v_y = 2x.
+\]
+
+\textbf{Step 2: Check C-R.}
+\[
+  u_x = 2x = v_y = 2x \quad \checkmark
+\]
+\[
+  u_y = 2y \neq -v_x = -2y \quad \text{(fails unless } y = 0\text{)}.
+\]
+
+C-R is satisfied only on the real axis ($y = 0$), i.e., at points of the form $(x, 0)$.
+
+\textbf{Step 3: Continuity.}
+All partials are continuous, but C-R holds only on $y=0$, not in an open neighbourhood of any point.
+
+\textbf{Step 4: Conclude.}
+$f$ is not analytic anywhere (not analytic in any open set).
+
+\begin{learnbox}{Example 4 Takeaway}
+C-R may hold on a line (a set of measure zero) without the function being differentiable in an open neighbourhood, so analyticity requires C-R to hold throughout an open region.
+\end{learnbox}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection*{Example 5: $f(z) = z^3$}
+
+Write $(x+iy)^3 = x^3 - 3xy^2 + i(3x^2y - y^3)$.
+
+So $u = x^3 - 3xy^2$ and $v = 3x^2y - y^3$.
+
+\textbf{Step 1: Partial derivatives.}
+\[
+  u_x = 3x^2 - 3y^2, \quad u_y = -6xy, \quad v_x = 6xy, \quad v_y = 3x^2 - 3y^2.
+\]
+
+\textbf{Step 2: C-R check.}
+\[
+  u_x = 3x^2-3y^2 = v_y \quad \checkmark
+\]
+\[
+  u_y = -6xy = -v_x = -6xy \quad \checkmark
+\]
+
+\textbf{Step 3: Derivative.}
+\[
+  f'(z) = u_x + i\,v_x = (3x^2-3y^2) + i(6xy) = 3(x^2-y^2+2ixy) = 3(x+iy)^2 = 3z^2.
+\]
+
+\begin{learnbox}{Example 5 Takeaway}
+$z^3$ is entire with $f'(z)=3z^2$; the power rule generalises perfectly to complex polynomials.
+\end{learnbox}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection*{Example 6: C-R Holds at One Point but Function is Not Analytic in a Neighbourhood}
+
+Let
+\[
+  f(z) = \begin{cases} \dfrac{\overline{z}^2}{z} & z \neq 0 \\ 0 & z = 0. \end{cases}
+\]
+
+\textbf{Step 1: Check C-R at $z = 0$.}
+
+Compute $f'(0)$ along the real axis ($\Delta z = \Delta x$, $\Delta y = 0$):
+\[
+  \lim_{\Delta x \to 0} \frac{f(\Delta x) - 0}{\Delta x}
+  = \lim_{\Delta x \to 0} \frac{(\Delta x)^2/\Delta x}{\Delta x}
+  = \lim_{\Delta x \to 0} 1 = 1.
+\]
+
+Along the imaginary axis ($\Delta z = i\Delta y$):
+\[
+  f(i\Delta y) = \frac{(i\Delta y)^2/(i\Delta y)}{i\Delta y}
+  = \frac{-(\Delta y)^2/(i\Delta y)}{i\Delta y}
+  = \frac{-\Delta y}{i \cdot i\,\Delta y}
+  \to \frac{-1}{i \cdot i} = \frac{-1}{-1} = 1.
+\]
+
+Both directions give 1, and one can verify C-R holds at $z_0 = 0$.
+
+\textbf{Step 2: Check along a general direction.}
+
+Let $\Delta z = \Delta x + i\,\Delta y$ with $\Delta y = m\,\Delta x$. Then as $\Delta z \to 0$:
+\[
+  \frac{f(\Delta z)}{\Delta z} = \frac{\overline{\Delta z}^2}{|\Delta z|^2}
+  = \frac{(\Delta x - im\Delta x)^2}{(\Delta x)^2(1+m^2)}
+  = \frac{(1-im)^2}{1+m^2}.
+\]
+This depends on $m$, so the limit is not unique --- $f$ is not differentiable at $z = 0$ in the strict sense (the limit varies with direction for $m \neq 0$ vs $m = \pm 1$).
+
+\textbf{Step 3: Conclude.}
+C-R may appear to hold in certain approach directions at a single point without implying genuine differentiability there. The sufficient condition (continuity of partials in a neighbourhood) is not met.
+
+\begin{learnbox}{Example 6 Takeaway}
+C-R holding at a single isolated point is not enough to guarantee differentiability. Always verify continuity of partial derivatives in a neighbourhood.
+\end{learnbox}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection*{Example 7: $f(z) = \sin z$}
+
+$\sin z = \sin(x+iy) = \sin x\cosh y + i\cos x\sinh y$.
+
+So $u = \sin x \cosh y$ and $v = \cos x \sinh y$.
+
+\textbf{Partial derivatives:}
+\[
+  u_x = \cos x\cosh y, \quad u_y = \sin x\sinh y,
+  \quad v_x = -\sin x\sinh y, \quad v_y = \cos x\cosh y.
+\]
+
+\textbf{C-R check:}
+\[
+  u_x = \cos x\cosh y = v_y \quad \checkmark
+\]
+\[
+  u_y = \sin x\sinh y = -v_x = \sin x\sinh y \quad \checkmark
+\]
+
+\textbf{Derivative:}
+\[
+  f'(z) = u_x + i\,v_x = \cos x\cosh y - i\sin x\sinh y = \cos(x+iy) = \cos z.
+\]
+
+\begin{learnbox}{Example 7 Takeaway}
+$\sin z$ is entire and $(\sin z)' = \cos z$, matching the real calculus identity.
+\end{learnbox}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection*{Example 8: $f(z) = \ln|z| + i\arg(z)$ in Polar Form}
+
+This is the principal logarithm $\operatorname{Log} z = \ln r + i\theta$, $r > 0$, $-\pi < \theta \leq \pi$.
+
+So $U = \ln r$ and $V = \theta$.
+
+\textbf{Partial derivatives:}
+\[
+  U_r = \frac{1}{r}, \quad U_\theta = 0, \quad V_r = 0, \quad V_\theta = 1.
+\]
+
+\textbf{Polar C-R check:}
+\[
+  U_r = \frac{1}{r} = \frac{1}{r}V_\theta = \frac{1}{r} \quad \checkmark
+\]
+\[
+  V_r = 0 = -\frac{1}{r}U_\theta = 0 \quad \checkmark
+\]
+
+\textbf{Derivative:}
+\[
+  f'(z) = e^{-i\theta}(U_r + i\,V_r) = e^{-i\theta}\cdot\frac{1}{r} = \frac{1}{re^{i\theta}} = \frac{1}{z}.
+\]
+
+\begin{learnbox}{Example 8 Takeaway}
+The polar C-R equations confirm that $\operatorname{Log} z$ is analytic for $r > 0$ away from the branch cut $\theta = \pi$, with derivative $1/z$.
+\end{learnbox}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Flowchart for Testing Analyticity (MANDATORY UPGRADE)}
+% ══════════════════════════════════════════════════════════════════════════════
+
+Use the following procedure to decide whether $f(z) = u+iv$ is analytic at a point $z_0 = x_0 + iy_0$:
+
+\begin{center}
+\begin{tikzpicture}[
+  box/.style={rectangle, draw=blue!70!black, fill=blue!8, rounded corners,
+              text width=7cm, align=center, minimum height=1cm},
+  decision/.style={diamond, draw=orange!80!black, fill=orange!10, aspect=2.5,
+                   text width=4.5cm, align=center},
+  arrow/.style={->, thick, >=stealth},
+  yes/.style={right, font=\small\color{green!60!black}},
+  no/.style={left, font=\small\color{red!70!black}}
+]
+
+\node[box] (S1) at (0, 0) {\textbf{Step 1.} Write $f(z)=u(x,y)+iv(x,y)$ explicitly.};
+\node[box] (S2) at (0,-2) {\textbf{Step 2.} Compute all four partials: $u_x, u_y, v_x, v_y$.};
+\node[decision] (D1) at (0,-4.2) {Do $u_x = v_y$ AND $u_y = -v_x$ at $(x_0,y_0)$?};
+\node[box] (S3) at (4.5,-6.4) {\textbf{Step 3.} C-R fails. $f$ is \textbf{NOT differentiable} at $z_0$.};
+\node[decision] (D2) at (-4.5,-6.4) {Are $u_x, u_y, v_x, v_y$ continuous in a neighbourhood of $(x_0,y_0)$?};
+\node[box] (S4) at (-4.5,-9) {C-R holds but partials not continuous. \textbf{Inconclusive --- more analysis needed.}};
+\node[box] (S5) at (0,-9) {\textbf{Step 4.} $f$ is \textbf{differentiable} (and analytic if C-R holds throughout an open set).};
+
+\draw[arrow] (S1) -- (S2);
+\draw[arrow] (S2) -- (D1);
+\draw[arrow] (D1) -- node[yes]{YES} (-4.5,-4.2) -- (D2);
+\draw[arrow] (D1) -- node[no]{NO}  (4.5,-4.2)  -- (S3);
+\draw[arrow] (D2) -- node[no]{NO} (S4);
+\draw[arrow] (D2) -- node[yes]{YES} (0,-6.4)  -- (S5);
+
+\end{tikzpicture}
+\end{center}
+
+\medskip
+
+\textbf{Prose summary of the flowchart:}
+\begin{enumerate}[noitemsep]
+  \item \textbf{Write $u$ and $v$:} Express $f(z)$ in the form $u(x,y)+iv(x,y)$ explicitly.
+  \item \textbf{Find partial derivatives:} Compute $u_x$, $u_y$, $v_x$, $v_y$ as functions of $x$ and $y$.
+  \item \textbf{Check C-R:} Verify $u_x = v_y$ and $u_y = -v_x$ at the point of interest.
+  \item \textbf{Check continuity of partials:} Confirm that all four partial derivatives are continuous in an open neighbourhood of the point.
+  \item \textbf{Conclude:} If both Step 3 and Step 4 pass, $f$ is differentiable (and hence analytic in that neighbourhood).
+\end{enumerate}
+
+\begin{learnbox}{Flowchart Takeaway}
+Follow all five steps in sequence. Stopping at Step 3 (C-R alone) is a common and costly error --- continuity of partial derivatives is equally required for the sufficient condition.
+\end{learnbox}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Excel Example (MANDATORY)}
+% ══════════════════════════════════════════════════════════════════════════════
+
+\textbf{Goal:} Numerically verify the C-R equations for $f(z) = z^2$, i.e., $u = x^2-y^2$ and $v = 2xy$, by computing approximate partial derivatives using finite differences in a spreadsheet.
+
+\paragraph{Spreadsheet layout.}
+
+Use step size $h = 0.001$ in column G.
+
+\begin{center}
+\begin{tabular}{cllllllll}
+\toprule
+\textbf{Row} & \textbf{A} ($x$) & \textbf{B} ($y$) & \textbf{C} ($u$) & \textbf{D} ($v$) & \textbf{E} ($u_x$) & \textbf{F} ($v_y$) & \textbf{G} ($u_y$) & \textbf{H} ($-v_x$) \\
+\midrule
+1 & Header & Header & Header & Header & Header & Header & Header & Header \\
+2 & 1.0 & 0.5 & $=\text{A2}^2-\text{B2}^2$ & $=2*\text{A2}*\text{B2}$ & (see below) & (see below) & (see below) & (see below) \\
+3 & 2.0 & 1.0 & $=\text{A3}^2-\text{B3}^2$ & $=2*\text{A3}*\text{B3}$ & & & & \\
+4 & 3.0 & 1.5 & $=\text{A4}^2-\text{B4}^2$ & $=2*\text{A4}*\text{B4}$ & & & & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Finite-difference formulas (for Row 2 onwards).}
+
+Let $h = 0.001$ be stored in cell \texttt{I1}.
+
+\begin{itemize}[noitemsep]
+  \item Column C (\textbf{u}): \quad \texttt{=A2\^{}2 - B2\^{}2}
+  \item Column D (\textbf{v}): \quad \texttt{=2*A2*B2}
+  \item Column E (\textbf{u\_x}): \quad \texttt{=((A2+\$I\$1)\^{}2 - B2\^{}2 - (A2-\$I\$1)\^{}2 + B2\^{}2) / (2*\$I\$1)}
+  \item Column F (\textbf{v\_y}): \quad \texttt{=(2*A2*(B2+\$I\$1) - 2*A2*(B2-\$I\$1)) / (2*\$I\$1)}
+  \item Column G (\textbf{u\_y}): \quad \texttt{=(A2\^{}2-(B2+\$I\$1)\^{}2 - A2\^{}2+(B2-\$I\$1)\^{}2)/(2*\$I\$1)}
+  \item Column H (\textbf{-v\_x}): \quad \texttt{=-(2*(A2+\$I\$1)*B2 - 2*(A2-\$I\$1)*B2)/(2*\$I\$1)}
+\end{itemize}
+
+\paragraph{Sample computed values.}
+
+\begin{center}
+\begin{tabular}{ccccccccc}
+\toprule
+$x$ & $y$ & $u$ & $v$ & $u_x$ (E) & $v_y$ (F) & $u_y$ (G) & $-v_x$ (H) & C-R? \\
+\midrule
+1.0 & 0.5 & 0.75 & 1.00 & 2.000 & 2.000 & $-1.000$ & $-1.000$ & \checkmark \\
+2.0 & 1.0 & 3.00 & 4.00 & 4.000 & 4.000 & $-2.000$ & $-2.000$ & \checkmark \\
+3.0 & 1.5 & 6.75 & 9.00 & 6.000 & 6.000 & $-3.000$ & $-3.000$ & \checkmark \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Columns E and F agree to at least 3 decimal places; columns G and H agree similarly, confirming C-R numerically.
+
+\begin{learnbox}{Excel Takeaway}
+Finite-difference approximations in a spreadsheet provide a quick numerical sanity check for C-R equations without symbolic computation.
+\end{learnbox}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Python Example (MANDATORY)}
+% ══════════════════════════════════════════════════════════════════════════════
+
+The script below uses \texttt{sympy} to compute $u_x$, $u_y$, $v_x$, $v_y$ symbolically and verify the C-R equations for several functions.
+
+\begin{lstlisting}[language=Python]
+from sympy import symbols, exp, cos, sin, re, im, simplify, I
+
+x, y = symbols('x y', real=True)
+
+def check_CR(u_expr, v_expr, fname="f"):
+    """
+    Given symbolic u and v (functions of x, y),
+    compute partial derivatives and verify C-R equations.
+    """
+    ux = u_expr.diff(x)
+    uy = u_expr.diff(y)
+    vx = v_expr.diff(x)
+    vy = v_expr.diff(y)
+
+    cr1 = simplify(ux - vy)   # should be 0 if C-R holds
+    cr2 = simplify(uy + vx)   # should be 0 if C-R holds
+
+    print(f"\n--- {fname} ---")
+    print(f"  u  = {u_expr}")
+    print(f"  v  = {v_expr}")
+    print(f"  u_x = {ux},  v_y = {vy}")
+    print(f"  u_y = {uy},  v_x = {vx}")
+    print(f"  C-R eq 1: u_x - v_y = {cr1}  (0 => C-R holds)")
+    print(f"  C-R eq 2: u_y + v_x = {cr2}  (0 => C-R holds)")
+
+    if cr1 == 0 and cr2 == 0:
+        # Compute derivative using f'(z) = u_x + i*v_x
+        dfdz = simplify(ux + I*vx)
+        print(f"  f'(z) = {dfdz}")
+    else:
+        print("  C-R equations NOT satisfied => function is NOT analytic.")
+
+# Example 1: f(z) = z^2 => u = x^2 - y^2, v = 2xy
+u1 = x**2 - y**2
+v1 = 2*x*y
+check_CR(u1, v1, "f(z) = z^2")
+
+# Example 2: f(z) = e^z => u = e^x*cos(y), v = e^x*sin(y)
+u2 = exp(x)*cos(y)
+v2 = exp(x)*sin(y)
+check_CR(u2, v2, "f(z) = e^z")
+
+# Example 3: f(z) = conj(z) => u = x, v = -y
+u3 = x
+v3 = -y
+check_CR(u3, v3, "f(z) = conj(z)")
+
+# Example 4: f(z) = x^2+y^2 + i*(2xy) (not analytic)
+u4 = x**2 + y**2
+v4 = 2*x*y
+check_CR(u4, v4, "f(z) = x^2+y^2 + i*2xy")
+
+# Example 5: f(z) = sin(z) => u = sin(x)*cosh(y), v = cos(x)*sinh(y)
+from sympy import cosh, sinh
+u5 = sin(x)*cosh(y)
+v5 = cos(x)*sinh(y)
+check_CR(u5, v5, "f(z) = sin(z)")
+
+# Expected output:
+# --- f(z) = z^2 ---
+#   u_x = 2*x,  v_y = 2*x
+#   u_y = -2*y,  v_x = 2*y
+#   C-R eq 1: 0   C-R eq 2: 0
+#   f'(z) = 2*x + 2*I*y  (= 2z)
+#
+# --- f(z) = e^z ---
+#   C-R eq 1: 0   C-R eq 2: 0
+#   f'(z) = exp(x)*cos(y) + I*exp(x)*sin(y)  (= e^z)
+#
+# --- f(z) = conj(z) ---
+#   C-R eq 1: 2  (nonzero) => NOT analytic
+#
+# --- f(z) = x^2+y^2 + i*2xy ---
+#   C-R eq 1: 2*y  (nonzero) => NOT analytic
+#
+# --- f(z) = sin(z) ---
+#   C-R eq 1: 0   C-R eq 2: 0
+#   f'(z) = cos(x)*cosh(y) - I*sin(x)*sinh(y)  (= cos(z))
+\end{lstlisting}
+
+\begin{learnbox}{Python Takeaway}
+\texttt{sympy} automates the tedious partial-derivative computations and lets you verify C-R equations symbolically for any function, providing the derivative $f'(z) = u_x + iv_x$ when C-R holds.
+\end{learnbox}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Viva Questions}
+% ══════════════════════════════════════════════════════════════════════════════
+
+\begin{enumerate}
+  \item \textbf{State the Cauchy-Riemann equations in Cartesian form.}\\
+  The C-R equations are $u_x = v_y$ and $u_y = -v_x$, where $f(z) = u(x,y)+iv(x,y)$.
+
+  \item \textbf{Are the C-R equations necessary or sufficient for differentiability? Explain.}\\
+  They are \emph{necessary}: if $f$ is differentiable then C-R must hold. They are \emph{sufficient} only when additionally the partial derivatives are continuous in a neighbourhood of the point.
+
+  \item \textbf{What is the polar form of the C-R equations and when do you use it?}\\
+  $U_r = \dfrac{1}{r}V_\theta$ and $V_r = -\dfrac{1}{r}U_\theta$. Use polar form when $f(z)$ is naturally expressed in terms of $r$ and $\theta$.
+
+  \item \textbf{Why is $f(z) = \overline{z}$ nowhere differentiable?}\\
+  For $\overline{z}$, $u = x$ and $v = -y$, giving $u_x = 1$ but $v_y = -1$. Since $u_x \neq v_y$ everywhere, C-R fails everywhere.
+
+  \item \textbf{Give two equivalent expressions for $f'(z)$ in terms of partial derivatives.}\\
+  $f'(z) = u_x + iv_x$ (from the real-axis approach) and $f'(z) = v_y - iu_y$ (from the imaginary-axis approach). Both agree when C-R holds.
+
+  \item \textbf{Can C-R hold at a single point without the function being analytic in any neighbourhood? Give an example.}\\
+  Yes. For $f(z) = \overline{z}^2/z$ ($z\neq 0$), $f(0)=0$, C-R can be made to appear satisfied at $z=0$ along certain directions, yet $f$ is not differentiable at 0 because the limit depends on the approach direction.
+
+  \item \textbf{What geometric property of a complex function is guaranteed by the C-R equations?}\\
+  Conformality (angle preservation): a function satisfying C-R with non-zero derivative preserves angles and orientations between intersecting curves at the point.
+
+  \item \textbf{If $f$ is analytic in a region $D$, what can you say about the functions $u$ and $v$?}\\
+  Both $u$ and $v$ are harmonic in $D$ (i.e., they satisfy Laplace's equation $u_{xx}+u_{yy}=0$ and $v_{xx}+v_{yy}=0$), and they are harmonic conjugates of each other.
+\end{enumerate}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Descriptive Questions}
+% ══════════════════════════════════════════════════════════════════════════════
+
+\begin{enumerate}
+  \item \textbf{Derive the Cauchy-Riemann equations from first principles.}\\
+  Starting from the definition of the complex derivative, take the limit $\Delta z \to 0$ first along the real axis (setting $\Delta y = 0$) and then along the imaginary axis (setting $\Delta x = 0$). Equating the real and imaginary parts of the two expressions for $f'(z)$ yields $u_x = v_y$ and $u_y = -v_x$. State clearly what each step assumes and why the two-path argument is necessary.
+
+  \item \textbf{State and prove the sufficient condition for differentiability using C-R equations.}\\
+  State the theorem: if $u_x, u_y, v_x, v_y$ exist and are continuous in a neighbourhood of $z_0$ and C-R holds at $z_0$, then $f$ is differentiable at $z_0$. In the proof, expand $\Delta u$ and $\Delta v$ using the total-differential approximation (valid because the partials are continuous), substitute into the difference quotient, and show the limit equals $u_x + iv_x$.
+
+  \item \textbf{Derive the polar form of the C-R equations from the Cartesian form.}\\
+  Use $x = r\cos\theta$, $y = r\sin\theta$ and apply the chain rule to express $u_x, u_y, v_x, v_y$ in terms of $U_r, U_\theta, V_r, V_\theta$. Substitute into $u_x = v_y$ and $u_y = -v_x$ and simplify to get $U_r = V_\theta/r$ and $V_r = -U_\theta/r$.
+
+  \item \textbf{Show that $f(z) = z^2$ is analytic everywhere and find its derivative using C-R equations.}\\
+  Write $u = x^2-y^2$, $v = 2xy$. Compute all four partial derivatives, verify C-R, confirm continuity of partials everywhere, and conclude $f$ is entire. Compute $f'(z) = u_x + iv_x = 2x + 2iy = 2z$.
+
+  \item \textbf{Explain with an example why checking C-R at a single point is insufficient for analyticity.}\\
+  Use $f(z) = x^2+y^2+i(2xy)$. Show C-R holds on $y=0$ but fails off this line. Explain that analyticity requires C-R to hold throughout an open region, not just at isolated points or along curves.
+\end{enumerate}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Practice Problems}
+% ══════════════════════════════════════════════════════════════════════════════
+
+\begin{enumerate}
+  \item \textbf{Check whether $f(z) = z^4$ satisfies the C-R equations and find $f'(z)$.}\\
+  \textit{Hint:} Write $(x+iy)^4$, expand, identify $u$ and $v$, compute partials, verify C-R. The answer is $f'(z) = 4z^3$.
+
+  \item \textbf{Show that $f(z) = |z|^2 = x^2 + y^2$ is differentiable only at $z = 0$.}\\
+  \textit{Hint:} Here $u = x^2+y^2$ and $v = 0$. C-R gives $2x = 0$ and $2y = 0$, so only $(0,0)$ satisfies C-R.
+
+  \item \textbf{Verify that $f(z) = e^{-y}\cos x + ie^{-y}\sin x$ is analytic and find $f'(z)$.}\\
+  \textit{Hint:} Identify $u = e^{-y}\cos x$, $v = e^{-y}\sin x$. Compute $u_x, v_y$ etc. Notice this is $e^{iz}$.
+
+  \item \textbf{Using polar C-R equations, show that $f(z) = r^2 e^{2i\theta} = (re^{i\theta})^2 = z^2$ is analytic.}\\
+  \textit{Hint:} $U = r^2\cos 2\theta$, $V = r^2\sin 2\theta$. Compute $U_r = 2r\cos2\theta$ and $V_\theta/r = 2r\cos2\theta$. Check the second polar C-R similarly.
+
+  \item \textbf{Show that $f(z) = \cos z = \cos x\cosh y - i\sin x\sinh y$ is entire.}\\
+  \textit{Hint:} Identify $u$ and $v$; compute $u_x = -\sin x\cosh y$ and $v_y = -\sin x\cosh y$. Verify $u_y = v_x$ condition similarly.
+
+  \item \textbf{Determine all points where $f(z) = (x^2 - y^2 - 2y) + i(2xy + 2x)$ is differentiable, and find $f'(z)$.}\\
+  \textit{Hint:} C-R: $u_x = 2x = v_y = 2x$\,\checkmark. And $u_y = -2y-2 = -v_x = -2x-2$, which requires $y = x$. So $f$ is differentiable along $y = x$ but not in any open region; hence $f$ is nowhere analytic.
+\end{enumerate}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{MCQs}
+% ══════════════════════════════════════════════════════════════════════════════
+
+\begin{enumerate}
+  \item The Cauchy-Riemann equations for $f(z) = u + iv$ in Cartesian form are:
+  \begin{enumerate}[(a)]
+    \item $u_x = v_x$ and $u_y = v_y$
+    \item \textbf{(b) $u_x = v_y$ and $u_y = -v_x$}
+    \item $u_x = -v_y$ and $u_y = v_x$
+    \item $u_x = v_y$ and $u_y = v_x$
+  \end{enumerate}
+  \textit{Explanation:} The derivation by taking limits along the real and imaginary axes yields $u_x = v_y$ and $u_y = -v_x$; option (b) is the correct standard form.
+
+  \medskip
+
+  \item Which of the following functions is \textbf{nowhere} analytic in $\mathbb{C}$?
+  \begin{enumerate}[(a)]
+    \item $f(z) = z^3$
+    \item $f(z) = e^z$
+    \item \textbf{(c) $f(z) = \overline{z}$}
+    \item $f(z) = \sin z$
+  \end{enumerate}
+  \textit{Explanation:} For $\overline{z}$, $u_x = 1$ but $v_y = -1$, so C-R fails everywhere; the other three are entire.
+
+  \medskip
+
+  \item The polar form of the C-R equations is:
+  \begin{enumerate}[(a)]
+    \item $U_r = r\,V_\theta$ and $V_r = r\,U_\theta$
+    \item $U_r = V_r$ and $U_\theta = V_\theta$
+    \item \textbf{(c) $U_r = \dfrac{1}{r}V_\theta$ and $V_r = -\dfrac{1}{r}U_\theta$}
+    \item $r\,U_r = V_\theta$ and $r\,V_r = -U_\theta$
+  \end{enumerate}
+  \textit{Explanation:} The polar C-R equations obtained from the Cartesian form using the chain rule are $U_r = V_\theta/r$ and $V_r = -U_\theta/r$; option (c) states them correctly.
+
+  \medskip
+
+  \item The C-R equations are \rule{1.5cm}{0.4pt} for differentiability of a complex function.
+  \begin{enumerate}[(a)]
+    \item Sufficient but not necessary
+    \item \textbf{(b) Necessary but not sufficient (without continuity of partials)}
+    \item Both necessary and sufficient always
+    \item Neither necessary nor sufficient
+  \end{enumerate}
+  \textit{Explanation:} C-R is necessary (differentiability implies C-R), but to guarantee differentiability we also need the partial derivatives to be continuous in a neighbourhood; hence necessary but not sufficient on their own.
+
+  \medskip
+
+  \item If $f(z) = u + iv$ is analytic in a region $D$, which equation does $u$ satisfy?
+  \begin{enumerate}[(a)]
+    \item $u_{xx} + u_{yy} = 1$
+    \item $u_{xx} - u_{yy} = 0$
+    \item \textbf{(c) $u_{xx} + u_{yy} = 0$}
+    \item $u_{xy} = 0$
+  \end{enumerate}
+  \textit{Explanation:} Differentiating the C-R equations and combining gives $u_{xx} + u_{yy} = 0$, i.e., $u$ is harmonic (satisfies Laplace's equation) in $D$.
+\end{enumerate}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Common Mistakes}
+% ══════════════════════════════════════════════════════════════════════════════
+
+\begin{mistakebox}{Common Mistakes with Cauchy-Riemann Equations}
+\begin{center}
+\begin{tabular}{p{4.5cm} p{4.5cm} p{4.5cm}}
+\toprule
+\textbf{Mistake} & \textbf{Why It Is Wrong} & \textbf{Correct Approach} \\
+\midrule
+Checking C-R at only one point and declaring $f$ analytic everywhere &
+Analyticity requires C-R to hold throughout an \emph{open region}, not just at a single point &
+Verify C-R for all $(x,y)$ in the desired domain and check continuity of partials in that region \\
+\midrule
+Forgetting that continuity of partial derivatives is required for the sufficient condition &
+C-R alone (without continuity) does not guarantee differentiability; there exist functions satisfying C-R at a point but failing to be differentiable there &
+State and verify all three conditions: existence, C-R, and continuity of $u_x, u_y, v_x, v_y$ in a neighbourhood \\
+\midrule
+Writing the sign as $u_y = +v_x$ instead of $u_y = -v_x$ &
+Confusing the direction of the imaginary axis approach; the factor $1/i = -i$ introduces a minus sign in the second equation &
+Remember: $u_y = -v_x$ (minus sign on $v_x$ side). Cross-check with a simple example like $z^2$ \\
+\midrule
+Mixing up Cartesian and polar partial derivatives &
+$U_r$ is \emph{not} the same as $u_x$; using Cartesian formulas in a polar setting gives wrong results &
+Choose the correct form (Cartesian or polar) to match how $f(z)$ is given, and do not mix the two systems \\
+\midrule
+Concluding $f$ is non-differentiable because C-R fails on a line &
+C-R failing on a curve does not mean $f$ is nowhere differentiable; it only rules out analyticity in a region containing that curve &
+Check which specific points satisfy C-R and state differentiability pointwise vs.\ analyticity in a region \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{mistakebox}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Quick Recap}
+% ══════════════════════════════════════════════════════════════════════════════
+
+\begin{learnbox}{Quick Recap --- Topic 04: Cauchy-Riemann Equations}
+\begin{itemize}[noitemsep]
+  \item \textbf{C-R equations (Cartesian):} $u_x = v_y$ and $u_y = -v_x$; both must hold simultaneously.
+  \item \textbf{Necessary condition:} If $f$ is differentiable at $z_0$, then C-R holds at $z_0$; the converse requires continuity of partials.
+  \item \textbf{Sufficient condition:} C-R $+$ continuity of all four partial derivatives in a neighbourhood of $z_0$ $\Rightarrow$ $f$ is differentiable at $z_0$.
+  \item \textbf{Derivative formulas:} $f'(z) = u_x + iv_x = v_y - iu_y$ (all equivalent when C-R holds).
+  \item \textbf{Polar C-R:} $U_r = \dfrac{1}{r}V_\theta$ and $V_r = -\dfrac{1}{r}U_\theta$; use when $f$ is given in polar form.
+  \item \textbf{Analyticity:} $f$ is analytic in an open region $D$ iff C-R holds at every point of $D$ with continuous partials throughout $D$.
+  \item \textbf{Consequence:} Every analytic function has a harmonic real part and a harmonic imaginary part; $u_{xx}+u_{yy} = 0$ and $v_{xx}+v_{yy} = 0$.
+  \item \textbf{Key example:} $\overline{z}$ fails C-R everywhere (nowhere analytic); $e^z$ satisfies C-R everywhere (entire).
+\end{itemize}
+\end{learnbox}
+
+\end{document}
