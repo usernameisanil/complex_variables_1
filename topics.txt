@@ -1,0 +1,24 @@
+UNIT I: Complex Variable – Differentiation
+------------------------------------------
+Introduction to functions of complex variable.
+Concept of Limit & continuity.
+Differentiation.
+Cauchy-Riemann equations.
+Analytic functions.
+Harmonic functions.
+Finding harmonic conjugate.
+Construction of analytic function by Milne Thomson method.
+
+UNIT II: Complex Variable – Integration
+----------------------------------------
+Line integral.
+Contour integration.
+Cauchy's integral theorem (Simple Case).
+Cauchy Integral formula.
+Power series expansions: Taylor's series.
+Zeros of analytic functions.
+Singularities.
+Laurent's series.
+Residues.
+Cauchy Residue theorem (without proof).
+Evaluation of definite integral involving sine and cosine.

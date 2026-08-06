@@ -1,0 +1,9 @@
+When generating a LaTeX response for a Complex Variables topic:
+
+1. Use \documentclass{article} with amsmath, amssymb, amsthm, geometry packages
+2. Include a title block with topic name, unit, and course details
+3. Follow the section structure specified in the prompt
+4. Include all worked examples with step-by-step solutions
+5. Use proper LaTeX math environments (equation, align, cases)
+6. Include a summary box at the end with key formulas
+7. Ensure all complex number notation is correctly typeset
