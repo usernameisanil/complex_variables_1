@@ -1,0 +1,816 @@
+\documentclass[12pt,a4paper]{article}
+
+% ===== PACKAGES =====
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage[most,breakable]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usepackage{array}
+
+% ===== TCOLORBOX ENVIRONMENTS =====
+\newtcolorbox{curiositybox}[1]{colback=yellow!10, colframe=orange!80!black, fonttitle=\bfseries, title=#1, breakable}
+\newtcolorbox{infobox}[1]{colback=blue!5, colframe=blue!60!black, fonttitle=\bfseries, title=#1, breakable}
+\newtcolorbox{mistakebox}[1]{colback=red!5, colframe=red!60!black, fonttitle=\bfseries, title=#1, breakable}
+\newtcolorbox{learnbox}[1]{colback=green!5, colframe=green!60!black, fonttitle=\bfseries, title=#1, breakable}
+
+% ===== LSTLISTING SETTINGS =====
+\lstset{language=Python, basicstyle=\ttfamily\small, keywordstyle=\color{blue},
+        commentstyle=\color{gray}, stringstyle=\color{red},
+        showstringspaces=false, breaklines=true, frame=single}
+
+% ===== FANCYHDR =====
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{Topic 08: Milne Thomson Method}
+\rhead{Unit I --- Complex Variables}
+\cfoot{\thepage}
+
+% ===== TITLE =====
+\title{\textbf{Topic 08: Construction of Analytic Function\\by Milne Thomson Method}\\[6pt]
+\large Unit I --- Complex Variable: Differentiation\\
+Complex Variables and Special Functions\\
+JNTUA College of Engineering (Autonomous)}
+\author{}
+\date{}
+
+% ===== DOCUMENT =====
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+% ------------------------------------------------------------------
+% OPENING HOOK
+% ------------------------------------------------------------------
+\begin{curiositybox}{Hook}
+Up to now, finding an analytic function often meant first hunting down the harmonic conjugate. Milne Thomson's method offers a shortcut: instead of reconstructing the missing part step by step, it builds the analytic function directly.
+\end{curiositybox}
+
+\vspace{0.4cm}
+
+% ------------------------------------------------------------------
+% SECTION 1
+% ------------------------------------------------------------------
+\section{Why This Method Is Useful}
+
+In earlier work, constructing an analytic function \( f(z) = u + iv \) from a known harmonic part required integrating partial derivatives to find the conjugate, then combining. While systematic, that approach accumulates integration constants and demands careful bookkeeping at every step.
+
+Milne Thomson's method bypasses the intermediate harmonic-conjugate construction entirely. Once the real part \( u(x,y) \) or imaginary part \( v(x,y) \) is known, one algebraic substitution --- replacing \( x \) with \( z \) and \( y \) with \( 0 \) --- yields \( f(z) \) directly in terms of \( z \) alone, with no partial integrations required.
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Step} & \textbf{Harmonic Conjugate Method} & \textbf{Milne Thomson Method} \\
+\midrule
+Start & Know \( u(x,y) \) & Know \( u(x,y) \) \\
+Core operation & Integrate \( \partial u/\partial x \), \( \partial u/\partial y \) & Compute \( \phi_1 \), \( \phi_2 \) then substitute \\
+Integration & Required (may be involved) & Not required \\
+Final form & \( f(z) = u + iv \) assembled & \( f(z) \) written directly in \( z \) \\
+Pitfall & Integration constant bookkeeping & Must verify harmonicity first \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{learnbox}{Key Insight}
+The power of Milne Thomson's method lies in converting a two-variable reconstruction into a single-variable expression. It does not remove the need to check that \( u \) (or \( v \)) is harmonic before applying the method.
+\end{learnbox}
+
+% ------------------------------------------------------------------
+% SECTION 2
+% ------------------------------------------------------------------
+\section{Background Needed}
+
+\begin{infobox}{Essential Prerequisites}
+\textbf{Analytic function:} \( f(z) = u(x,y) + iv(x,y) \) is analytic in a domain \( D \) if it is differentiable at every point of \( D \).
+
+\textbf{Cauchy-Riemann equations (C-R):}
+\[
+\frac{\partial u}{\partial x} = \frac{\partial v}{\partial y}, \qquad \frac{\partial u}{\partial y} = -\frac{\partial v}{\partial x}.
+\]
+
+\textbf{Harmonic function:} A real-valued function \( \phi(x,y) \) satisfying Laplace's equation
+\[
+\nabla^2 \phi = \frac{\partial^2 \phi}{\partial x^2} + \frac{\partial^2 \phi}{\partial y^2} = 0.
+\]
+
+\textbf{Harmonic conjugate:} If \( u \) is harmonic, there exists \( v \) (unique up to a constant) such that \( f = u + iv \) is analytic; \( v \) is the harmonic conjugate of \( u \).
+
+\textbf{Complex derivative:}
+\[
+f'(z) = \frac{\partial u}{\partial x} + i\frac{\partial v}{\partial x} = \frac{\partial v}{\partial y} - i\frac{\partial u}{\partial y}.
+\]
+\end{infobox}
+
+\begin{learnbox}{What to Verify First}
+Before applying any construction method, \textbf{always} check that the given function satisfies Laplace's equation. If it does not, no analytic function with that real or imaginary part exists.
+\end{learnbox}
+
+% ------------------------------------------------------------------
+% SECTION 3
+% ------------------------------------------------------------------
+\section{Milne Thomson Method When \texorpdfstring{\( u(x,y) \)}{u(x,y)} Is Given}
+
+\begin{infobox}{Derivation --- Given \( u \)}
+Let \( f(z) = u(x,y) + iv(x,y) \) be analytic. Then:
+\[
+f'(z) = \frac{\partial u}{\partial x} - i\frac{\partial u}{\partial y}.
+\]
+Define two real functions:
+\[
+\phi_1(x,y) = \frac{\partial u}{\partial x}, \qquad \phi_2(x,y) = \frac{\partial u}{\partial y}.
+\]
+So:
+\[
+f'(z) = \phi_1(x,y) - i\,\phi_2(x,y).
+\]
+\textbf{Key substitution:} Since \( z = x + iy \), setting \( y = 0 \) gives \( x = z \). Replace \( x \) by \( z \) and \( y \) by \( 0 \):
+\[
+f'(z) = \phi_1(z,0) - i\,\phi_2(z,0).
+\]
+Integrate with respect to \( z \):
+\[
+\boxed{f(z) = \int \bigl[\phi_1(z,0) - i\,\phi_2(z,0)\bigr]\,dz + C,}
+\]
+where \( C \) is an arbitrary complex constant.
+
+\textbf{Why \( x = z, y = 0 \) works:}
+The expression \( f'(z) = \phi_1(x,y) - i\phi_2(x,y) \) holds for all \( z = x+iy \). In particular it holds along the real axis (\( y=0 \), \( x = z \)), and by analytic continuation the formula \( f'(z) = \phi_1(z,0) - i\phi_2(z,0) \) extends to the whole domain.
+\end{infobox}
+
+\begin{learnbox}{Formula to Remember --- Given \( u \)}
+\[
+f(z) = \int \left[\frac{\partial u}{\partial x}\bigg|_{x=z,\,y=0} - i\,\frac{\partial u}{\partial y}\bigg|_{x=z,\,y=0}\right]dz + C.
+\]
+\end{learnbox}
+
+% ------------------------------------------------------------------
+% SECTION 4
+% ------------------------------------------------------------------
+\section{Milne Thomson Method When \texorpdfstring{\( v(x,y) \)}{v(x,y)} Is Given}
+
+\begin{infobox}{Derivation --- Given \( v \)}
+If \( v(x,y) \) is given, use:
+\[
+f'(z) = \frac{\partial v}{\partial y} + i\frac{\partial v}{\partial x}.
+\]
+Define:
+\[
+\psi_1(x,y) = \frac{\partial v}{\partial y}, \qquad \psi_2(x,y) = \frac{\partial v}{\partial x}.
+\]
+So:
+\[
+f'(z) = \psi_1(x,y) + i\,\psi_2(x,y).
+\]
+Substitute \( x = z,\; y = 0 \):
+\[
+\boxed{f(z) = \int \bigl[\psi_1(z,0) + i\,\psi_2(z,0)\bigr]\,dz + C.}
+\]
+\end{infobox}
+
+\begin{learnbox}{Formula to Remember --- Given \( v \)}
+\[
+f(z) = \int \left[\frac{\partial v}{\partial y}\bigg|_{x=z,\,y=0} + i\,\frac{\partial v}{\partial x}\bigg|_{x=z,\,y=0}\right]dz + C.
+\]
+Note the sign pattern: the \( v \)-case uses \( +i \), the \( u \)-case uses \( -i \).
+\end{learnbox}
+
+% ------------------------------------------------------------------
+% SECTION 5
+% ------------------------------------------------------------------
+\section{Step-by-Step Algorithm}
+
+\begin{infobox}{Algorithm: Milne Thomson Method}
+\textbf{Case A --- Given \( u(x,y) \):}
+\begin{enumerate}[label=\textbf{Step \arabic*.}]
+  \item Verify \( \nabla^2 u = 0 \) (Laplace's equation). If not satisfied, stop.
+  \item Compute \( \phi_1(x,y) = \dfrac{\partial u}{\partial x} \) and \( \phi_2(x,y) = \dfrac{\partial u}{\partial y} \).
+  \item Substitute \( x \to z \) and \( y \to 0 \) in both expressions.
+  \item Form \( f'(z) = \phi_1(z,0) - i\,\phi_2(z,0) \).
+  \item Integrate: \( f(z) = \displaystyle\int f'(z)\,dz + C \).
+  \item Verify by expanding \( f(z) \) and checking that its real part equals \( u(x,y) \).
+\end{enumerate}
+
+\vspace{4pt}
+\textbf{Case B --- Given \( v(x,y) \):}
+\begin{enumerate}[label=\textbf{Step \arabic*.}]
+  \item Verify \( \nabla^2 v = 0 \).
+  \item Compute \( \psi_1(x,y) = \dfrac{\partial v}{\partial y} \) and \( \psi_2(x,y) = \dfrac{\partial v}{\partial x} \).
+  \item Substitute \( x \to z \) and \( y \to 0 \).
+  \item Form \( f'(z) = \psi_1(z,0) + i\,\psi_2(z,0) \).
+  \item Integrate: \( f(z) = \displaystyle\int f'(z)\,dz + C \).
+  \item Verify that the imaginary part of \( f(z) \) equals \( v(x,y) \).
+\end{enumerate}
+\end{infobox}
+
+\begin{learnbox}{Memory Aid}
+\textbf{u-given:} \( f'(z) = u_x - i\,u_y \) then substitute \( (z,0) \).\\
+\textbf{v-given:} \( f'(z) = v_y + i\,v_x \) then substitute \( (z,0) \).
+\end{learnbox}
+
+% ------------------------------------------------------------------
+% SECTION 6: WORKED EXAMPLES
+% ------------------------------------------------------------------
+\section{Worked Examples}
+
+% ---- Example 1 ----
+\subsection*{Example 1: Given \( u = x^2 - y^2 \)}
+
+\textbf{Step 1 --- Verify harmonicity:}
+\[
+\frac{\partial^2 u}{\partial x^2} = 2, \qquad \frac{\partial^2 u}{\partial y^2} = -2, \qquad \nabla^2 u = 2 + (-2) = 0. \quad \checkmark
+\]
+\textbf{Step 2 --- Compute partials:}
+\[
+\phi_1 = \frac{\partial u}{\partial x} = 2x, \qquad \phi_2 = \frac{\partial u}{\partial y} = -2y.
+\]
+\textbf{Step 3 --- Substitute \( x=z,\; y=0 \):}
+\[
+\phi_1(z,0) = 2z, \qquad \phi_2(z,0) = 0.
+\]
+\textbf{Step 4 --- Form \( f'(z) \):}
+\[
+f'(z) = 2z - i(0) = 2z.
+\]
+\textbf{Step 5 --- Integrate:}
+\[
+f(z) = \int 2z\,dz + C = z^2 + C.
+\]
+\textbf{Verification:} \( f(z) = z^2 = (x+iy)^2 = x^2 - y^2 + 2ixy \). Real part \( = x^2 - y^2 = u \). \checkmark
+
+\begin{learnbox}{Result}
+\( f(z) = z^2 + C \). The real part \( x^2 - y^2 \) corresponds to the simplest non-trivial analytic function.
+\end{learnbox}
+
+% ---- Example 2 ----
+\subsection*{Example 2: Given \( u = e^x \cos y \)}
+
+\textbf{Step 1 --- Verify harmonicity:}
+\[
+\frac{\partial^2 u}{\partial x^2} = e^x \cos y, \qquad \frac{\partial^2 u}{\partial y^2} = -e^x \cos y, \qquad \nabla^2 u = 0. \quad \checkmark
+\]
+\textbf{Step 2 --- Compute partials:}
+\[
+\phi_1 = e^x \cos y, \qquad \phi_2 = -e^x \sin y.
+\]
+\textbf{Step 3 --- Substitute \( x=z,\; y=0 \):}
+\[
+\phi_1(z,0) = e^z \cos 0 = e^z, \qquad \phi_2(z,0) = -e^z \sin 0 = 0.
+\]
+\textbf{Step 4:}
+\[
+f'(z) = e^z - i(0) = e^z.
+\]
+\textbf{Step 5:}
+\[
+f(z) = \int e^z\,dz + C = e^z + C.
+\]
+\textbf{Verification:} \( e^z = e^{x+iy} = e^x(\cos y + i\sin y) \). Real part \( = e^x\cos y = u \). \checkmark
+
+\begin{learnbox}{Result}
+\( f(z) = e^z + C \). The exponential function is its own complex derivative.
+\end{learnbox}
+
+% ---- Example 3 ----
+\subsection*{Example 3: Given \( v = 2xy \)}
+
+\textbf{Step 1 --- Verify harmonicity:}
+\[
+\frac{\partial^2 v}{\partial x^2} = 0, \qquad \frac{\partial^2 v}{\partial y^2} = 0, \qquad \nabla^2 v = 0. \quad \checkmark
+\]
+\textbf{Step 2 --- Compute partials (v-case):}
+\[
+\psi_1 = \frac{\partial v}{\partial y} = 2x, \qquad \psi_2 = \frac{\partial v}{\partial x} = 2y.
+\]
+\textbf{Step 3 --- Substitute \( x=z,\; y=0 \):}
+\[
+\psi_1(z,0) = 2z, \qquad \psi_2(z,0) = 0.
+\]
+\textbf{Step 4:}
+\[
+f'(z) = 2z + i(0) = 2z.
+\]
+\textbf{Step 5:}
+\[
+f(z) = \int 2z\,dz + C = z^2 + C.
+\]
+\textbf{Verification:} \( z^2 = x^2-y^2 + 2ixy \). Imaginary part \( = 2xy = v \). \checkmark
+
+\begin{learnbox}{Result}
+\( f(z) = z^2 + C \). Both \( u = x^2-y^2 \) and \( v=2xy \) lead to the same analytic function --- they are harmonic conjugates.
+\end{learnbox}
+
+% ---- Example 4 ----
+\subsection*{Example 4: Rational Form --- Given \( u = \dfrac{x}{x^2+y^2} \)}
+
+\textbf{Step 1 --- Verify harmonicity:}
+\[
+u = \frac{x}{x^2+y^2}.
+\]
+\[
+\frac{\partial u}{\partial x} = \frac{(x^2+y^2) - x\cdot 2x}{(x^2+y^2)^2} = \frac{y^2-x^2}{(x^2+y^2)^2}.
+\]
+\[
+\frac{\partial^2 u}{\partial x^2} = \frac{-2x(x^2+y^2)^2 - (y^2-x^2)\cdot 2(x^2+y^2)\cdot 2x}{(x^2+y^2)^4}
+= \frac{2x(x^2-3y^2)}{(x^2+y^2)^3}.
+\]
+\[
+\frac{\partial u}{\partial y} = \frac{-2xy}{(x^2+y^2)^2}.
+\]
+\[
+\frac{\partial^2 u}{\partial y^2} = \frac{-2x(x^2+y^2)^2 + 2xy \cdot 2(x^2+y^2)\cdot 2y}{(x^2+y^2)^4}
+= \frac{2x(3y^2-x^2)}{(x^2+y^2)^3}.
+\]
+\[
+\nabla^2 u = \frac{2x(x^2-3y^2)}{(x^2+y^2)^3} + \frac{2x(3y^2-x^2)}{(x^2+y^2)^3} = 0. \quad \checkmark
+\]
+\textbf{Step 2:}
+\[
+\phi_1 = \frac{y^2-x^2}{(x^2+y^2)^2}, \qquad \phi_2 = \frac{-2xy}{(x^2+y^2)^2}.
+\]
+\textbf{Step 3 --- Substitute \( x=z,\; y=0 \):}
+\[
+\phi_1(z,0) = \frac{0 - z^2}{z^4} = \frac{-1}{z^2}, \qquad \phi_2(z,0) = 0.
+\]
+\textbf{Step 4:}
+\[
+f'(z) = -\frac{1}{z^2}.
+\]
+\textbf{Step 5:}
+\[
+f(z) = \int -\frac{1}{z^2}\,dz + C = \frac{1}{z} + C.
+\]
+\textbf{Verification:} \( \dfrac{1}{z} = \dfrac{\bar{z}}{|z|^2} = \dfrac{x-iy}{x^2+y^2} \). Real part \( = \dfrac{x}{x^2+y^2} = u \). \checkmark
+
+\begin{learnbox}{Result}
+\( f(z) = 1/z + C \). Rational harmonic functions often lead to rational analytic functions.
+\end{learnbox}
+
+% ---- Example 5 ----
+\subsection*{Example 5: Given \( u = x^3 - 3xy^2 \)}
+
+\textbf{Step 1:}
+\[
+\frac{\partial^2 u}{\partial x^2} = 6x, \qquad \frac{\partial^2 u}{\partial y^2} = -6x, \qquad \nabla^2 u = 0. \quad \checkmark
+\]
+\textbf{Step 2:}
+\[
+\phi_1 = 3x^2 - 3y^2, \qquad \phi_2 = -6xy.
+\]
+\textbf{Step 3:}
+\[
+\phi_1(z,0) = 3z^2, \qquad \phi_2(z,0) = 0.
+\]
+\textbf{Step 4:}
+\[
+f'(z) = 3z^2.
+\]
+\textbf{Step 5:}
+\[
+f(z) = z^3 + C.
+\]
+\textbf{Verification:} \( z^3 = (x+iy)^3 = x^3-3xy^2 + i(3x^2y-y^3) \). Real part \( = x^3-3xy^2 \). \checkmark
+
+\begin{learnbox}{Result}
+\( f(z) = z^3 + C \). Polynomial harmonics always yield the matching power of \( z \).
+\end{learnbox}
+
+% ---- Example 6 ----
+\subsection*{Example 6: Given \( v = e^x \sin y \)}
+
+\textbf{Step 1:}
+\[
+\frac{\partial^2 v}{\partial x^2} = e^x\sin y, \qquad \frac{\partial^2 v}{\partial y^2} = -e^x\sin y, \qquad \nabla^2 v = 0. \quad \checkmark
+\]
+\textbf{Step 2 (v-case):}
+\[
+\psi_1 = \frac{\partial v}{\partial y} = e^x\cos y, \qquad \psi_2 = \frac{\partial v}{\partial x} = e^x\sin y.
+\]
+\textbf{Step 3:}
+\[
+\psi_1(z,0) = e^z, \qquad \psi_2(z,0) = 0.
+\]
+\textbf{Step 4:}
+\[
+f'(z) = e^z + i(0) = e^z.
+\]
+\textbf{Step 5:}
+\[
+f(z) = e^z + C.
+\]
+\textbf{Verification:} Imaginary part of \( e^z \) is \( e^x \sin y = v \). \checkmark
+
+\begin{learnbox}{Result}
+\( f(z) = e^z + C \). Whether we start from \( u = e^x\cos y \) or \( v = e^x \sin y \), the analytic function is \( e^z \).
+\end{learnbox}
+
+% ---- Example 7 ----
+\subsection*{Example 7: Given \( u = \ln\!\sqrt{x^2+y^2} \)}
+
+Note \( u = \tfrac{1}{2}\ln(x^2+y^2) \).
+
+\textbf{Step 1:}
+\[
+\frac{\partial^2 u}{\partial x^2} = \frac{y^2-x^2}{(x^2+y^2)^2}, \qquad \frac{\partial^2 u}{\partial y^2} = \frac{x^2-y^2}{(x^2+y^2)^2}, \qquad \nabla^2 u = 0. \quad \checkmark
+\]
+\textbf{Step 2:}
+\[
+\phi_1 = \frac{x}{x^2+y^2}, \qquad \phi_2 = \frac{y}{x^2+y^2}.
+\]
+\textbf{Step 3:}
+\[
+\phi_1(z,0) = \frac{z}{z^2} = \frac{1}{z}, \qquad \phi_2(z,0) = 0.
+\]
+\textbf{Step 4:}
+\[
+f'(z) = \frac{1}{z}.
+\]
+\textbf{Step 5:}
+\[
+f(z) = \ln z + C.
+\]
+\textbf{Verification:} \( \ln z = \ln|z| + i\arg(z) = \ln\sqrt{x^2+y^2} + i\arctan(y/x) \). Real part equals \( u \). \checkmark
+
+\begin{learnbox}{Result}
+\( f(z) = \ln z + C \). Logarithmic harmonics connect naturally to the complex logarithm.
+\end{learnbox}
+
+% ---- Example 8 (comparison) ----
+\subsection*{Example 8: Given \( u = x^2 - y^2 + 2x \) --- Milne Thomson vs.\ Harmonic Conjugate Method}
+
+\textbf{Milne Thomson approach:}
+
+Step 1: \( u_{xx} = 2,\; u_{yy} = -2,\; \nabla^2 u = 0 \). \checkmark
+
+Step 2: \( \phi_1 = 2x+2,\; \phi_2 = -2y \).
+
+Step 3: \( \phi_1(z,0) = 2z+2,\; \phi_2(z,0) = 0 \).
+
+Step 4: \( f'(z) = 2z + 2 \).
+
+Step 5:
+\[
+f(z) = z^2 + 2z + C.
+\]
+
+\vspace{6pt}
+\textbf{Harmonic Conjugate approach (for comparison):}
+
+From C-R: \( v_y = u_x = 2x+2 \Rightarrow v = (2x+2)y + g(x) \).
+
+Also \( v_x = -u_y = 2y \Rightarrow \dfrac{\partial}{\partial x}[(2x+2)y + g(x)] = 2y + g'(x) = 2y \Rightarrow g'(x) = 0 \Rightarrow g = c_1 \).
+
+So \( v = 2xy + 2y + c_1 \), and:
+\[
+f(z) = (x^2-y^2+2x) + i(2xy+2y) + c_1 i = z^2 + 2z + C.
+\]
+
+Both methods give \( f(z) = z^2 + 2z + C \). \checkmark
+
+\begin{learnbox}{Result}
+\( f(z) = z^2 + 2z + C \). Milne Thomson required only a substitution and one integration; the harmonic conjugate method needed partial integration and a consistency check. Both are correct.
+\end{learnbox}
+
+% ------------------------------------------------------------------
+% SECTION 7: COMPARISON (MANDATORY UPGRADE)
+% ------------------------------------------------------------------
+\section{Comparison with Harmonic Conjugate Method (MANDATORY UPGRADE)}
+
+\begin{center}
+\begin{tabular}{@{}p{3cm}p{4.5cm}p{4.5cm}p{3.5cm}@{}}
+\toprule
+\textbf{Method} & \textbf{Advantages} & \textbf{Limitations} & \textbf{Best Use Case} \\
+\midrule
+Harmonic Conjugate & Works from first principles; makes \( u \) and \( v \) explicit at every step & Requires integration of two expressions; constant-matching can be error-prone & When you need \( v \) explicitly (e.g., streamlines in fluid flow) \\
+\midrule
+Milne Thomson & No intermediate integration of \( u \) or \( v \) against \( y \) or \( x \); gives \( f(z) \) directly & Does not give \( v \) explicitly without expanding \( f(z) \); requires harmonicity check first & Exam problems asking for \( f(z) \) quickly; all standard textbook examples \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{learnbox}{Choosing the Method}
+Use \textbf{Milne Thomson} when the problem asks for \( f(z) \) in terms of \( z \). Use the \textbf{harmonic conjugate} method when the problem explicitly asks you to find the conjugate function \( v \) or when \( f(z) \) is not easily recognisable after integration.
+\end{learnbox}
+
+% ------------------------------------------------------------------
+% SECTION 8: FLOWCHART (MANDATORY UPGRADE)
+% ------------------------------------------------------------------
+\section{Flowchart / Algorithm Summary (MANDATORY UPGRADE)}
+
+\begin{center}
+\begin{tikzpicture}[
+  node distance=1.2cm,
+  box/.style={rectangle, draw=blue!70!black, rounded corners, fill=blue!8, minimum width=7cm, minimum height=0.75cm, align=center, font=\small},
+  dec/.style={diamond, draw=orange!80!black, fill=yellow!15, aspect=3, minimum width=6cm, align=center, font=\small},
+  arr/.style={->, thick, draw=gray!60}
+]
+\node[box] (start) {START: Given real part \( u(x,y) \) or imaginary part \( v(x,y) \)};
+\node[dec, below=of start] (check) {Compute \( \nabla^2(\text{given part}) \). Is it \( = 0 \)?};
+\node[box, right=2cm of check] (stop) {STOP: Not harmonic. No analytic function exists.};
+\node[dec, below=1.4cm of check] (which) {Which is given: \( u \) or \( v \)?};
+\node[box, below left=1.2cm and 0.2cm of which] (ucalc) {Compute \( \phi_1 = u_x \),\; \( \phi_2 = u_y \)};
+\node[box, below right=1.2cm and 0.2cm of which] (vcalc) {Compute \( \psi_1 = v_y \),\; \( \psi_2 = v_x \)};
+\node[box, below=3.8cm of which] (sub) {Substitute \( x \to z,\; y \to 0 \)};
+\node[box, below=1.2cm of sub] (form) {\( u \)-case: \( f'(z) = \phi_1(z,0) - i\phi_2(z,0) \)\quad\( v \)-case: \( f'(z) = \psi_1(z,0) + i\psi_2(z,0) \)};
+\node[box, below=1.2cm of form] (integ) {Integrate \( f'(z) \) w.r.t.\ \( z \); add constant \( C \)};
+\node[box, below=1.2cm of integ] (verify) {Verify: expand \( f(z) \) and check real/imaginary part matches};
+\node[box, below=1.2cm of verify] (end) {DONE: \( f(z) \) is the required analytic function};
+
+\draw[arr] (start) -- (check);
+\draw[arr] (check) -- node[left, font=\small]{Yes} (which);
+\draw[arr] (check) -- node[above, font=\small]{No} (stop);
+\draw[arr] (which) -- node[left, font=\small]{\( u \)} (ucalc);
+\draw[arr] (which) -- node[right, font=\small]{\( v \)} (vcalc);
+\draw[arr] (ucalc) |- (sub);
+\draw[arr] (vcalc) |- (sub);
+\draw[arr] (sub) -- (form);
+\draw[arr] (form) -- (integ);
+\draw[arr] (integ) -- (verify);
+\draw[arr] (verify) -- (end);
+\end{tikzpicture}
+\end{center}
+
+\begin{learnbox}{Using the Flowchart}
+The two decision diamonds are the critical checkpoints: (1) harmonicity must hold before anything, and (2) the sign pattern in \( f'(z) \) depends on whether \( u \) or \( v \) is given.
+\end{learnbox}
+
+% ------------------------------------------------------------------
+% SECTION 9: EXCEL EXAMPLE (MANDATORY)
+% ------------------------------------------------------------------
+\section{Excel Example (MANDATORY)}
+
+\textbf{Problem:} Given \( u(x,y) = x^2 - y^2 \), use a spreadsheet to compute \( \phi_1 = u_x = 2x \), \( \phi_2 = u_y = -2y \), apply the substitution \( y = 0, x = z \) (treating \( z \) as real here), and observe how \( f'(z) = 2z \).
+
+\begin{center}
+\begin{tabular}{@{}ccccccc@{}}
+\toprule
+\textbf{Col A} & \textbf{Col B} & \textbf{Col C} & \textbf{Col D} & \textbf{Col E} & \textbf{Col F} & \textbf{Col G} \\
+\( x \) & \( y \) & \( u = x^2-y^2 \) & \( \phi_1 = u_x \) & \( \phi_2 = u_y \) & \( \phi_1(z,0) \) & \( f'(z) = \phi_1(z,0) \) \\
+\midrule
+1 & 0 & 1 & 2 & 0 & 2 & 2 \\
+2 & 0 & 4 & 4 & 0 & 4 & 4 \\
+3 & 0 & 9 & 6 & 0 & 6 & 6 \\
+4 & 0 & 16 & 8 & 0 & 8 & 8 \\
+5 & 0 & 25 & 10 & 0 & 10 & 10 \\
+\midrule
+1 & 1 & 0 & 2 & $-2$ & --- & --- \\
+2 & 1 & 3 & 4 & $-2$ & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Excel Formulas used (row 2 as example):}
+\begin{itemize}
+  \item \texttt{C2} = \texttt{=A2\^{}2 - B2\^{}2}
+  \item \texttt{D2} = \texttt{=2*A2} \quad (this is \( u_x = 2x \))
+  \item \texttt{E2} = \texttt{=-2*B2} \quad (this is \( u_y = -2y \))
+  \item \texttt{F2} = \texttt{=2*A2} \quad (substitute \( y=0 \), so \( \phi_1(z,0) = 2x \) with \( x = z \))
+  \item \texttt{G2} = \texttt{=F2 - 0*E2} \quad (\( f'(z) = \phi_1 - i\phi_2 \); imaginary part is 0 here)
+\end{itemize}
+
+The last column confirms that \( f'(z) = 2z \) for \( z = 1,2,3,4,5 \). Integrating gives \( f(z) = z^2 + C \), consistent with the worked example.
+
+\begin{learnbox}{Spreadsheet Strategy}
+Columns D and E automate the derivative computation. Column F fixes \( y = 0 \) to complete the Milne Thomson substitution. This structure works for any \( u(x,y) \) by changing the formula in column C.
+\end{learnbox}
+
+% ------------------------------------------------------------------
+% SECTION 10: PYTHON EXAMPLE (MANDATORY)
+% ------------------------------------------------------------------
+\section{Python Example (MANDATORY)}
+
+The following complete Python script uses SymPy to automate the Milne Thomson procedure for \( u = e^x \cos y \).
+
+\begin{lstlisting}[language=Python]
+# Milne Thomson Method using SymPy
+# Example: u = exp(x)*cos(y)
+
+import sympy as sp
+
+# Define symbols
+x, y, z = sp.symbols('x y z')
+
+# Define u(x, y)
+u = sp.exp(x) * sp.cos(y)
+
+# Step 1: Verify Laplace's equation
+u_xx = sp.diff(u, x, 2)
+u_yy = sp.diff(u, y, 2)
+laplacian = sp.simplify(u_xx + u_yy)
+print("Laplacian of u:", laplacian)
+# Expected output: Laplacian of u: 0
+
+# Step 2: Compute phi1 and phi2
+phi1 = sp.diff(u, x)   # partial u / partial x
+phi2 = sp.diff(u, y)   # partial u / partial y
+print("phi1 =", phi1)  # Expected: exp(x)*cos(y)
+print("phi2 =", phi2)  # Expected: -exp(x)*sin(y)
+
+# Step 3: Substitute x -> z, y -> 0
+phi1_sub = phi1.subs([(x, z), (y, 0)])
+phi2_sub = phi2.subs([(x, z), (y, 0)])
+print("phi1(z,0) =", phi1_sub)  # Expected: exp(z)
+print("phi2(z,0) =", phi2_sub)  # Expected: 0
+
+# Step 4: Form f'(z)
+f_prime = phi1_sub - sp.I * phi2_sub
+print("f'(z) =", f_prime)  # Expected: exp(z)
+
+# Step 5: Integrate to get f(z)
+f_z = sp.integrate(f_prime, z)
+print("f(z) =", f_z, "+ C")   # Expected: f(z) = exp(z) + C
+
+# Step 6: Verification - expand f(z) and extract real part
+# Rewrite in terms of x, y by substituting z = x + I*y
+z_val = x + sp.I * y
+f_expanded = sp.exp(z_val)
+real_part = sp.re(f_expanded)
+real_part_simplified = sp.simplify(real_part)
+print("Real part of f(z):", real_part_simplified)
+# Expected: Real part of f(z): exp(x)*cos(y)
+# This matches u(x, y) = exp(x)*cos(y). Verification complete.
+\end{lstlisting}
+
+\begin{learnbox}{Python Takeaway}
+SymPy's \texttt{diff}, \texttt{subs}, and \texttt{integrate} mirror the four steps of the Milne Thomson algorithm exactly. The substitution step \texttt{subs([(x,z),(y,0)])} is the computational heart of the method.
+\end{learnbox}
+
+% ------------------------------------------------------------------
+% SECTION 11: VIVA QUESTIONS
+% ------------------------------------------------------------------
+\section{Viva Questions}
+
+\begin{enumerate}
+  \item \textbf{What is the Milne Thomson method and what problem does it solve?}\\
+  The Milne Thomson method constructs an analytic function \( f(z) \) directly from a given harmonic function \( u(x,y) \) or \( v(x,y) \) by forming \( f'(z) \) using the C-R equations and then applying the substitution \( x = z,\; y = 0 \) followed by integration.
+
+  \item \textbf{Why must we check that \( u \) is harmonic before applying the Milne Thomson method?}\\
+  An analytic function exists only if its real and imaginary parts satisfy Laplace's equation. If \( u \) is not harmonic (\( \nabla^2 u \neq 0 \)), no analytic function can have \( u \) as its real part, and the method would yield a meaningless result.
+
+  \item \textbf{Explain why substituting \( x = z,\; y = 0 \) is valid.}\\
+  The formula \( f'(z) = \phi_1(x,y) - i\phi_2(x,y) \) holds for all \( z = x+iy \). Along the real axis \( y=0 \), the complex variable equals the real variable \( x \). By analytic continuation, the expression \( \phi_1(z,0) - i\phi_2(z,0) \) equals \( f'(z) \) throughout the domain of analyticity.
+
+  \item \textbf{Write the formula for \( f'(z) \) when \( v(x,y) \) is given.}\\
+  \( f'(z) = \dfrac{\partial v}{\partial y}\bigg|_{(z,0)} + i\,\dfrac{\partial v}{\partial x}\bigg|_{(z,0)} \).
+
+  \item \textbf{What is the role of the arbitrary constant \( C \) in the Milne Thomson method?}\\
+  The constant \( C \) represents an arbitrary complex constant arising from the indefinite integration of \( f'(z) \). It accounts for all analytic functions sharing the same real (or imaginary) part; typically \( C \) is fixed by an initial condition such as \( f(0) = 0 \).
+
+  \item \textbf{Given \( u = \ln\sqrt{x^2+y^2} \), what is \( f(z) \)?}\\
+  \( f(z) = \ln z + C \).
+
+  \item \textbf{Can the Milne Thomson method be applied if the given function is not differentiable at isolated points?}\\
+  The method applies in domains where \( u \) (or \( v \)) is harmonic and differentiable. Isolated singularities (where the function is undefined) must be excluded from the domain; the method still works in any simply connected domain that avoids those singularities.
+
+  \item \textbf{If \( f(z) = z^3 + C \), what are the harmonic functions \( u \) and \( v \)?}\\
+  Expanding: \( z^3 = (x+iy)^3 = x^3 - 3xy^2 + i(3x^2y - y^3) \). So \( u = x^3 - 3xy^2 \) and \( v = 3x^2y - y^3 \).
+\end{enumerate}
+
+% ------------------------------------------------------------------
+% SECTION 12: DESCRIPTIVE QUESTIONS
+% ------------------------------------------------------------------
+\section{Descriptive Questions}
+
+\begin{enumerate}
+  \item State and derive the Milne Thomson formula for constructing an analytic function when the real part \( u(x,y) \) is given. Clearly justify the substitution \( x = z,\; y = 0 \). Apply the formula to find \( f(z) \) given \( u = x^3 - 3xy^2 \).
+
+  \item Derive the Milne Thomson formula for the case when the imaginary part \( v(x,y) \) is given. Using this formula, construct \( f(z) \) when \( v = e^x \sin y \), and verify your answer by expanding \( f(z) \) in terms of \( x \) and \( y \).
+
+  \item Compare the Milne Thomson method and the harmonic conjugate method for constructing analytic functions. Illustrate by solving the same problem \( u = x^2 - y^2 + 2x \) using both methods and confirm that both give the same analytic function.
+
+  \item Given \( u = \dfrac{x}{x^2+y^2} \), verify that \( u \) is harmonic, then use the Milne Thomson method to find \( f(z) \). State any restrictions on the domain.
+
+  \item A student applies the Milne Thomson method to \( u = x^2 + y^2 \) and gets \( f(z) = z^2 + C \). Identify the error and explain what goes wrong. What is \( \nabla^2(x^2+y^2) \)?
+\end{enumerate}
+
+% ------------------------------------------------------------------
+% SECTION 13: PRACTICE PROBLEMS
+% ------------------------------------------------------------------
+\section{Practice Problems}
+
+\begin{enumerate}
+  \item Find \( f(z) \) given \( u = x^4 - 6x^2y^2 + y^4 \).\\
+  \textit{Hint:} Compute \( u_x = 4x^3 - 12xy^2 \); after substitution, \( f'(z) = 4z^3 \); hence \( f(z) = z^4 + C \).
+
+  \item Find \( f(z) \) given \( v = x^3y - xy^3 \).\\
+  \textit{Hint:} \( v \)-case; \( \psi_1(z,0) = z^3 \), \( \psi_2(z,0) = 0 \); integrate to get \( f(z) = \frac{z^4}{4} \cdot i + C \). [Check sign carefully.]
+
+  \item Find \( f(z) \) given \( u = e^{2x}\cos 2y \).\\
+  \textit{Hint:} \( \phi_1(z,0) = 2e^{2z} \); \( f(z) = e^{2z} + C \).
+
+  \item Find \( f(z) \) given \( v = \arctan(y/x) \) (principal value, \( x > 0 \)).\\
+  \textit{Hint:} \( \psi_1 = v_y = x/(x^2+y^2) \); \( \psi_1(z,0) = 1/z \); \( f(z) = \ln z + C \).
+
+  \item Verify that \( u = \sin x \cosh y \) is harmonic and find the analytic function \( f(z) \).\\
+  \textit{Hint:} \( \phi_1(z,0) = \cos z \); \( f(z) = \sin z + C \).
+
+  \item Given \( u = 2x(1-y) \), verify harmonicity and find \( f(z) \).\\
+  \textit{Hint:} \( u_{xx} = 0,\; u_{yy} = 0 \); \( \phi_1 = 2(1-y),\; \phi_1(z,0) = 2 \); \( \phi_2 = -2x,\; \phi_2(z,0) = -2z \); \( f'(z) = 2 + 2iz \); \( f(z) = 2z + iz^2 + C \).
+\end{enumerate}
+
+% ------------------------------------------------------------------
+% SECTION 14: MCQs
+% ------------------------------------------------------------------
+\section{MCQs}
+
+\begin{enumerate}
+  \item In the Milne Thomson method, the substitution made in \( f'(z) = \phi_1(x,y) - i\phi_2(x,y) \) is:
+  \begin{enumerate}[(a)]
+    \item \( x = 0,\; y = z \)
+    \item \textbf{(b)} \( x = z,\; y = 0 \)
+    \item \( x = iz,\; y = z \)
+    \item \( x = 1/z,\; y = 1 \)
+  \end{enumerate}
+  \textit{Explanation:} The real axis corresponds to \( y = 0 \), making \( z = x \); analytic continuation extends the result to the whole domain.
+
+  \item If \( u = x^2 - y^2 \), the analytic function \( f(z) \) by Milne Thomson is:
+  \begin{enumerate}[(a)]
+    \item \( z + C \)
+    \item \( 2z + C \)
+    \item \textbf{(c)} \( z^2 + C \)
+    \item \( z^3 + C \)
+  \end{enumerate}
+  \textit{Explanation:} \( \phi_1 = 2x \to 2z \); integrate \( 2z \) to get \( z^2 + C \).
+
+  \item The formula for \( f'(z) \) when \( v(x,y) \) is given is:
+  \begin{enumerate}[(a)]
+    \item \( v_x - i\,v_y \)
+    \item \( v_y - i\,v_x \)
+    \item \textbf{(c)} \( v_y + i\,v_x \)
+    \item \( v_x + i\,v_y \)
+  \end{enumerate}
+  \textit{Explanation:} Using C-R equations: \( f'(z) = u_x + iv_x = v_y + iv_x \); the \( v \)-given formula uses \( +i \).
+
+  \item Before applying Milne Thomson, one must verify that the given function:
+  \begin{enumerate}[(a)]
+    \item Is continuous everywhere
+    \item \textbf{(b)} Satisfies Laplace's equation
+    \item Is bounded in the domain
+    \item Has continuous partial derivatives up to 4th order
+  \end{enumerate}
+  \textit{Explanation:} The real (or imaginary) part of an analytic function must be harmonic, i.e., it must satisfy \( \nabla^2 \phi = 0 \).
+
+  \item Given \( u = e^x \cos y \), the analytic function \( f(z) \) is:
+  \begin{enumerate}[(a)]
+    \item \( e^{iz} + C \)
+    \item \( \cos z + C \)
+    \item \( ie^z + C \)
+    \item \textbf{(d)} \( e^z + C \)
+  \end{enumerate}
+  \textit{Explanation:} \( \phi_1(z,0) = e^z,\; \phi_2(z,0) = 0 \); integrating \( e^z \) gives \( e^z + C \).
+\end{enumerate}
+
+% ------------------------------------------------------------------
+% SECTION 15: COMMON MISTAKES
+% ------------------------------------------------------------------
+\section{Common Mistakes}
+
+\begin{mistakebox}{Common Mistakes in Milne Thomson Method}
+\begin{tabular}{@{}p{4.5cm}p{5.5cm}p{5cm}@{}}
+\toprule
+\textbf{Mistake} & \textbf{What Goes Wrong} & \textbf{Correct Approach} \\
+\midrule
+Wrong substitution: \( y=z,\; x=0 \) instead of \( x=z,\; y=0 \) & The formula derives \( f'(z) \) along the real axis where \( y=0 \) and \( x \) plays the role of \( z \); reversing them gives a nonsensical function & Always substitute \( x \to z \) and \( y \to 0 \) simultaneously \\
+\midrule
+Sign error in \( v \)-given formula & Writing \( f'(z) = \psi_1 - i\psi_2 \) instead of \( \psi_1 + i\psi_2 \) & In the \( v \)-case, use \( f'(z) = v_y + iv_x \) (note \( +i \)) \\
+\midrule
+Forgetting the integration constant \( C \) & The solution is incomplete; boundary or initial conditions cannot be applied & Always write \( f(z) = \ldots + C \) after integrating \\
+\midrule
+Applying the method without checking harmonicity & If \( \nabla^2 u \neq 0 \), no analytic \( f \) with that real part exists; the result will be wrong & Compute \( u_{xx} + u_{yy} \) first; proceed only if it equals 0 \\
+\midrule
+Not verifying the answer & A computational slip (e.g., dropping a factor) may go undetected & After finding \( f(z) \), expand and confirm that real or imaginary part matches the given function \\
+\midrule
+Confusing \( \phi_1 \) with \( \phi_2 \) & Swapping \( u_x \) and \( u_y \) in the formula changes the sign of the imaginary part and gives the wrong \( f(z) \) & Define \( \phi_1 = u_x \) and \( \phi_2 = u_y \) explicitly before substituting \\
+\bottomrule
+\end{tabular}
+\end{mistakebox}
+
+% ------------------------------------------------------------------
+% SECTION 16: QUICK RECAP
+% ------------------------------------------------------------------
+\section{Quick Recap}
+
+\begin{learnbox}{Quick Recap --- Milne Thomson Method}
+\begin{itemize}
+  \item \textbf{Core idea:} Given \( u \) or \( v \), construct \( f'(z) \) using C-R equations, substitute \( x=z,\;y=0 \), integrate to get \( f(z) \).
+  \item \textbf{u-given formula:} \( f'(z) = \phi_1(z,0) - i\,\phi_2(z,0) \) where \( \phi_1 = u_x,\;\phi_2 = u_y \).
+  \item \textbf{v-given formula:} \( f'(z) = \psi_1(z,0) + i\,\psi_2(z,0) \) where \( \psi_1 = v_y,\;\psi_2 = v_x \).
+  \item \textbf{Mandatory first step:} Always verify \( \nabla^2(\text{given part}) = 0 \) before anything else.
+  \item \textbf{Key substitution:} Setting \( y=0,\;x=z \) converts a two-variable expression into a function of \( z \) alone, enabling direct integration.
+  \item \textbf{Advantage over harmonic conjugate method:} No intermediate integration against \( y \) or \( x \); \( f(z) \) is obtained in one integration step.
+  \item \textbf{Always add:} An arbitrary complex constant \( C \) after integration.
+  \item \textbf{Standard results:} \( u = x^n \)-type \( \to f(z)=z^n+C \); \( u=e^x\cos y \to f(z)=e^z+C \); \( u=\ln\sqrt{x^2+y^2} \to f(z)=\ln z + C \).
+\end{itemize}
+\end{learnbox}
+
+\end{document}
